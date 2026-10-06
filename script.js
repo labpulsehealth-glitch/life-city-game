@@ -670,25 +670,14 @@ const lifeReveal =
    GENDER
 ===================================================== */
 
-document
-  .querySelectorAll(".gender-options button")
-  .forEach(button => {
+const gender = document.querySelector(
+  'input[name="gender"]:checked'
+)?.value;
 
-    button.addEventListener(
-      "click",
-      () => {
-
-        document
-          .querySelectorAll(".gender-options button")
-          .forEach(btn =>
-            btn.classList.remove("selected")
-          );
-
-        button.classList.add("selected");
-
-        selectedGender =
-          button.dataset.gender;
-
+if (!gender) {
+  showToast("Please select your gender.");
+  return;
+}
       }
     );
 
