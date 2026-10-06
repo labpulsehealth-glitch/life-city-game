@@ -645,7 +645,6 @@ const questions = [
 ===================================================== */
 
 let selectedGender = "";
-
 let questionIndex = 0;
 
 
@@ -665,21 +664,23 @@ const questionsScreen =
 const lifeReveal =
   document.getElementById("lifeReveal");
 
+const continueBtn =
+  document.getElementById("continueBtn");
+
 
 /* =====================================================
    GENDER
 ===================================================== */
 
-const gender = document.querySelector(
-  'input[name="gender"]:checked'
-)?.value;
+document
+  .querySelectorAll('input[name="gender"]')
+  .forEach(input => {
 
-if (!gender) {
-  showToast("Please select your gender.");
-  return;
-}
-      }
-    );
+    input.addEventListener("change", () => {
+
+      selectedGender = input.value;
+
+    });
 
   });
 
@@ -688,12 +689,14 @@ if (!gender) {
    BASIC REGISTRATION
 ===================================================== */
 
-document
-  .getElementById("basicNext")
-  .addEventListener(
+if (continueBtn) {
+
+  continueBtn.addEventListener(
     "click",
     startQuestions
   );
+
+}
 
 
 function startQuestions() {
@@ -712,6 +715,10 @@ function startQuestions() {
     );
 
 
+  /* -----------------------------
+     CHECK NICKNAME
+  ----------------------------- */
+
   if (!nickname) {
 
     showToast(
@@ -719,37 +726,75 @@ function startQuestions() {
     );
 
     return;
+
   }
 
 
-  if (!age || age < 16 || age > 80) {
+  /* -----------------------------
+     CHECK AGE
+  ----------------------------- */
+
+  if (
+    !age ||
+    age < 16 ||
+    age > 80
+  ) {
 
     showToast(
       "Enter an age between 16 and 80."
     );
 
     return;
+
   }
 
 
-  if (!selectedGender) {
+  /* -----------------------------
+     CHECK GENDER
+  ----------------------------- */
+
+  const selected =
+    document.querySelector(
+      'input[name="gender"]:checked'
+    );
+
+
+  if (!selected) {
 
     showToast(
       "Choose how the city knows you."
     );
 
     return;
+
   }
 
 
-  player.nickname = nickname;
+  selectedGender =
+    selected.value;
 
-  player.age = age;
 
-  player.gender = selectedGender;
+  /* -----------------------------
+     SAVE BASIC INFORMATION
+  ----------------------------- */
 
-  questionIndex = 0;
+  player.nickname =
+    nickname;
 
+  player.age =
+    age;
+
+  player.gender =
+    selectedGender;
+
+
+  questionIndex =
+    0;
+
+
+  /* -----------------------------
+     MOVE TO QUESTIONS
+  ----------------------------- */
 
   basicInformation
     .classList.add("hidden");
@@ -761,99 +806,38 @@ function startQuestions() {
   showQuestion();
 
 }
-const continueBtn = document.getElementById("continueBtn");
 
-if (continueBtn) {
-  continueBtn.addEventListener("click", () => {
-    const nickname = document.getElementById("nickname")?.value.trim();
-    const age = document.getElementById("age")?.value;
-    const gender = document.querySelector(
-      'input[name="gender"]:checked'
-    )?.value;
 
-    if (!nickname) {
-      showToast("Please enter your nickname.");
-      return;
-    }
+/* =====================================================
+   GENDER CARD CLICK SUPPORT
+===================================================== */
 
-    if (!age || Number(age) < 13) {
-      showToast("Please enter a valid age.");
-      return;
-    }
+document
+  .querySelectorAll(".gender-card")
+  .forEach(card => {
 
-    if (!gender) {
-      showToast("Please select your gender.");
-      return;
-    }
+    card.addEventListener(
+      "click",
+      () => {
 
-    // Collect the hidden-trait answers
-    const answers = {};
+        const radio =
+          card.querySelector(
+            'input[type="radio"]'
+          );
 
-    document.querySelectorAll(
-      '#registration input[type="radio"]:checked'
-    ).forEach(input => {
-      if (input.name !== "gender") {
-        answers[input.name] = input.value;
+        if (radio) {
+
+          radio.checked = true;
+
+          selectedGender =
+            radio.value;
+
+        }
+
       }
-    });
-
-    // Save registration information
-    player.nickname = nickname;
-    player.age = Number(age);
-    player.gender = gender;
-
-    // Apply hidden personality influences
-    applyTraits(answers);
-
-    // Generate the player's life silently
-    const life = findAvailableLife(gender);
-
-    if (!life) {
-      showToast("Unable to generate a life right now.");
-      return;
-    }
-
-    player.family = life.family;
-    player.position = life.position;
-    player.father = life.father;
-    player.mother = life.mother;
-    player.money = life.money;
-    player.surname = life.family;
-
-    player.id =
-      "P" +
-      Date.now().toString(36) +
-      Math.random().toString(36).substring(2, 7);
-
-    registeredWorld.push({
-      id: player.id,
-      family: player.family,
-      position: player.position,
-      gender: player.gender
-    });
-
-    localStorage.setItem(
-      "lifeCityPopulation",
-      JSON.stringify(registeredWorld)
     );
 
-    localStorage.setItem(
-      "lifeCityPlayer",
-      JSON.stringify(player)
-    );
-
-    // Close registration
-    const registration = document.getElementById("registration");
-
-    if (registration) {
-      registration.classList.remove("show");
-      registration.style.display = "none";
-    }
-
-    // Show the dramatic life reveal
-    showLifeReveal(life);
   });
-}
 
 /* =====================================================
    QUESTIONS
