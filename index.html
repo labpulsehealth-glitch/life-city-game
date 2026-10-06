@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life City</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- GAME -->
+  <main id="game">
+
+    <!-- TOP STATUS BAR -->
+    <header class="status-bar">
+      <div>
+        <span class="game-time" id="gameTime">08:00</span>
+        <span class="location" id="locationName">Your Street</span>
+      </div>
+
+      <div class="money">
+        ₦<span id="money">25,000</span>
+      </div>
+    </header>
+
+    <!-- WORLD -->
+    <section class="world-container">
+
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- PLAYER STATUS -->
+      <div class="needs-panel">
+
+        <div class="need">
+          <span>🍔</span>
+          <div class="bar">
+            <div id="hungerBar" class="fill hunger"></div>
+          </div>
+        </div>
+
+        <div class="need">
+          <span>⚡</span>
+          <div class="bar">
+            <div id="energyBar" class="fill energy"></div>
+          </div>
+        </div>
+
+        <div class="need">
+          <span>🚿</span>
+          <div class="bar">
+            <div id="hygieneBar" class="fill hygiene"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- INTERACTION MESSAGE -->
+      <div id="interactionBox" class="interaction hidden">
+        <strong id="interactionTitle"></strong>
+        <p id="interactionText"></p>
+        <button id="interactionButton">Interact</button>
+      </div>
+
+      <!-- PHONE -->
+      <div id="phone" class="phone">
+
+        <div class="phone-header">
+          <span id="phoneTime">08:00</span>
+          <span>● ● ●</span>
+        </div>
+
+        <div id="phoneHome" class="phone-screen">
+
+          <div class="phone-profile">
+            <div class="mini-avatar">🙂</div>
+
+            <div>
+              <strong id="playerName">Unknown</strong>
+              <small id="playerStatus">New in the city</small>
+            </div>
+          </div>
+
+          <div class="phone-app-grid">
+
+            <button class="app" data-app="profile">
+              <span>👤</span>
+              <small>Profile</small>
+            </button>
+
+            <button class="app" data-app="bank">
+              <span>💳</span>
+              <small>Bank</small>
+            </button>
+
+            <button class="app" data-app="house">
+              <span>🏠</span>
+              <small>House</small>
+            </button>
+
+            <button class="app" data-app="market">
+              <span>🛍️</span>
+              <small>Market</small>
+            </button>
+
+            <button class="app" data-app="messages">
+              <span>💬</span>
+              <small>Messages</small>
+            </button>
+
+            <button class="app" data-app="social">
+              <span>👥</span>
+              <small>Social</small>
+            </button>
+
+            <button class="app" data-app="jobs">
+              <span>💼</span>
+              <small>Jobs</small>
+            </button>
+
+            <button class="app" data-app="news">
+              <span>📰</span>
+              <small>News</small>
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- APP WINDOW -->
+        <div id="appWindow" class="phone-screen app-window hidden">
+
+          <button id="closeApp" class="back-button">‹</button>
+
+          <h2 id="appTitle">App</h2>
+
+          <div id="appContent"></div>
+
+        </div>
+
+        <nav class="phone-nav">
+          <button id="homeButton">⌂<small>Home</small></button>
+          <button id="appsButton">▦<small>Apps</small></button>
+          <button id="phoneButton">📱<small>Phone</small></button>
+        </nav>
+
+      </div>
+
+      <!-- PHONE TOGGLE -->
+      <button id="phoneToggle" class="phone-toggle">
+        📱
+      </button>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+
+        <button data-key="up">▲</button>
+
+        <div>
+          <button data-key="left">◀</button>
+          <button data-key="down">▼</button>
+          <button data-key="right">▶</button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- CHARACTER CREATION -->
+  <section id="introScreen" class="intro-screen">
+
+    <div class="intro-card">
+
+      <span class="eyebrow">A NEW LIFE BEGINS</span>
+
+      <h1>Welcome to the City.</h1>
+
+      <p>
+        You don't get to choose exactly who you become.
+        Your choices will shape the person you grow into.
+      </p>
+
+      <div id="questionArea">
+
+        <h2 id="question"></h2>
+
+        <div id="answers"></div>
+
+      </div>
+
+      <div id="introProgress"></div>
+
+    </div>
+
+  </section>
+
+
+  <div id="toast" class="toast"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
