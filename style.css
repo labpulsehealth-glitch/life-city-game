@@ -1009,3 +1009,43 @@ body {
 .hidden {
   display: none !important;
 }
+
+.gender-options {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.gender-card {
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid #ddd;
+  border-radius: 14px;
+  padding: 16px 10px;
+  text-align: center;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.gender-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gender-card span {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.gender-card strong {
+  font-size: 14px;
+}
+
+.gender-card:has(input:checked) {
+  border-color: #0f766e;
+  background: #e6fffb;
+  transform: translateY(-2px);
+}
