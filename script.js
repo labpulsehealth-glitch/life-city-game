@@ -668,7 +668,6 @@ const lifeReveal =
 const continueBtn =
   document.getElementById("continueBtn");
 
-
 /* =====================================================
    GENDER
 ===================================================== */
@@ -679,11 +678,31 @@ document
 
     input.addEventListener("change", () => {
 
-      selectedGender = input.value;
+      selectedGender =
+        input.value;
 
     });
 
   });
+
+
+/* =====================================================
+   CONTINUE BUTTON
+===================================================== */
+
+const continueBtn =
+  document.getElementById("continueBtn");
+
+if (continueBtn) {
+
+  continueBtn.addEventListener(
+    "click",
+    startQuestions
+  );
+
+}
+
+
 
 
 /* =====================================================
