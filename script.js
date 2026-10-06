@@ -104,7 +104,8 @@ const defaultPlayer = {
     intelligence: 0,
     loyalty: 0,
     risk: 0
-  }
+    patience: 0
+}
 
 };
 
