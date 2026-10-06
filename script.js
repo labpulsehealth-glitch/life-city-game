@@ -1,29 +1,7 @@
 /* =====================================================
    LIFE CITY
-   COMPLETE 3D BROWSER GAME FOUNDATION
-
-   Engine:
+   3D BROWSER GAME FOUNDATION
    Babylon.js
-
-   Systems:
-   - 3D world
-   - character
-   - movement
-   - registration
-   - hidden traits
-   - family generation
-   - house
-   - furniture
-   - phone
-   - market
-   - food
-   - jobs
-   - social
-   - news
-   - Dessert Dash
-   - fictional combat/training
-   - wanted system
-   - saving
 ===================================================== */
 
 
@@ -34,31 +12,21 @@
 const Game = {
 
   engine: null,
-
   scene: null,
-
   camera: null,
 
   playerMesh: null,
-
   playerParts: {},
 
   npcs: [],
-
   enemies: [],
-
   bullets: [],
-
   buildings: [],
-
   furniture: [],
 
   mode: "city",
-
   houseMode: false,
-
   phoneOpen: false,
-
   gameStarted: false,
 
   currentLocation: "Your Street",
@@ -81,118 +49,21 @@ const Game = {
   },
 
   foodGame: {
-
     active: false,
-
     score: 0,
-
     lives: 3,
-
     time: 30,
-
     objects: [],
-
     timer: null
-
   },
 
   worldDay: 1
 
 };
 
+
 /* =====================================================
-   GENDER + CONTINUE
-===================================================== */
-
-const genderOptions = document.querySelectorAll(
-  'input[name="gender"]'
-);
-
-genderOptions.forEach(input => {
-  input.addEventListener("change", function () {
-    selectedGender = this.value;
-
-    document
-      .querySelectorAll(".gender-card")
-      .forEach(card => {
-        card.classList.remove("selected");
-      });
-
-    this.closest(".gender-card")
-      .classList.add("selected");
-  });
-});
-
-
-const continueBtn =
-  document.getElementById("continueBtn");
-
-
-continueBtn.addEventListener("click", function () {
-
-  const nickname =
-    document
-      .getElementById("nicknameInput")
-      .value
-      .trim();
-
-  const age =
-    Number(
-      document
-        .getElementById("ageInput")
-        .value
-    );
-
-  const chosenGender =
-    document.querySelector(
-      'input[name="gender"]:checked'
-    );
-
-
-  if (!nickname) {
-    showToast(
-      "Enter the name people will call you."
-    );
-    return;
-  }
-
-
-  if (!age || age < 16 || age > 80) {
-    showToast(
-      "Enter an age between 16 and 80."
-    );
-    return;
-  }
-
-
-  if (!chosenGender) {
-    showToast(
-      "Please select your gender."
-    );
-    return;
-  }
-
-
-  /* SAVE BASIC INFORMATION */
-
-  player.nickname = nickname;
-  player.age = age;
-  player.gender = chosenGender.value;
-
-
-  /* MOVE TO QUESTIONS */
-
-  basicInformation.classList.add("hidden");
-
-  questionsScreen.classList.remove("hidden");
-
-  questionIndex = 0;
-
-  showQuestion();
-
-});
-/* =====================================================
-   PLAYER
+   DEFAULT PLAYER
 ===================================================== */
 
 const defaultPlayer = {
@@ -200,23 +71,16 @@ const defaultPlayer = {
   id: null,
 
   nickname: "",
-
   age: 19,
-
   gender: "",
 
   surname: "",
-
   family: "",
-
   familyType: "",
-
   familyDescription: "",
 
   position: "",
-
   father: "",
-
   mother: "",
 
   identity: "",
@@ -224,11 +88,8 @@ const defaultPlayer = {
   money: 0,
 
   hunger: 100,
-
   energy: 100,
-
   hygiene: 100,
-
   health: 100,
 
   houseType: "Apartment",
@@ -236,17 +97,11 @@ const defaultPlayer = {
   traits: {
 
     ambition: 0,
-
     courage: 0,
-
     kindness: 0,
-
     intelligence: 0,
-
     loyalty: 0,
-
     risk: 0,
-
     patience: 0
 
   }
@@ -254,26 +109,38 @@ const defaultPlayer = {
 };
 
 
+/* =====================================================
+   LOAD SAVED DATA
+===================================================== */
+
 let player =
   JSON.parse(
-    localStorage.getItem(
-      "lifeCityPlayer"
-    )
-  ) ||
-  structuredClone(defaultPlayer);
+    localStorage.getItem("lifeCityPlayer")
+  ) || structuredClone(defaultPlayer);
 
 
 let population =
   JSON.parse(
-    localStorage.getItem(
-      "lifeCityPopulation"
-    )
-  ) ||
-  {};
+    localStorage.getItem("lifeCityPopulation")
+  ) || {};
+
+
+/*
+   Make sure older saved players don't break
+   the new version.
+*/
+
+player.traits = {
+
+  ...defaultPlayer.traits,
+
+  ...(player.traits || {})
+
+};
 
 
 /* =====================================================
-   SAVE
+   SAVE GAME
 ===================================================== */
 
 function saveGame() {
@@ -292,13 +159,20 @@ function saveGame() {
 
 
 /* =====================================================
+   REGISTRATION STATE
+===================================================== */
+
+let selectedGender = "";
+let questionIndex = 0;
+
+
+/* =====================================================
    FAMILY DATABASE
 ===================================================== */
 
 const families = [
 
   {
-
     id: "russo",
 
     surname: "Russo",
@@ -317,12 +191,10 @@ const families = [
     money: 75000,
 
     color: "#991b1b"
-
   },
 
 
   {
-
     id: "varelli",
 
     surname: "Varelli",
@@ -341,12 +213,10 @@ const families = [
     money: 85000,
 
     color: "#4338ca"
-
   },
 
 
   {
-
     id: "moretti",
 
     surname: "Moretti",
@@ -365,12 +235,10 @@ const families = [
     money: 100000,
 
     color: "#92400e"
-
   },
 
 
   {
-
     id: "bellini",
 
     surname: "Bellini",
@@ -389,20 +257,18 @@ const families = [
     money: 90000,
 
     color: "#7e22ce"
-
   }
 
 ];
 
 
 /* =====================================================
-   QUESTIONS
+   LIFE QUESTIONS
 ===================================================== */
 
 const questions = [
 
   {
-
     text:
       "Someone you love is in trouble. Helping them could put you in trouble too. What do you do?",
 
@@ -448,12 +314,10 @@ const questions = [
       }
 
     ]
-
   },
 
 
   {
-
     text:
       "You discover that someone has been secretly talking about you.",
 
@@ -498,12 +362,10 @@ const questions = [
       }
 
     ]
-
   },
 
 
   {
-
     text:
       "You suddenly receive an opportunity that could completely change your life.",
 
@@ -548,12 +410,10 @@ const questions = [
       }
 
     ]
-
   },
 
 
   {
-
     text:
       "Someone weaker than you is being treated unfairly.",
 
@@ -599,12 +459,10 @@ const questions = [
       }
 
     ]
-
   },
 
 
   {
-
     text:
       "You could become extremely successful, but your success might create enemies.",
 
@@ -649,50 +507,883 @@ const questions = [
       }
 
     ]
-
   }
 
 ];
 
 
 /* =====================================================
-   DOM
+   DOM ELEMENTS
 ===================================================== */
 
 const canvas =
-  document.getElementById(
-    "gameCanvas"
-  );
+  document.getElementById("gameCanvas");
 
 const registration =
-  document.getElementById(
-    "registration"
-  );
+  document.getElementById("registration");
 
 const basicInformation =
-  document.getElementById(
-    "basicInformation"
-  );
+  document.getElementById("basicInformation");
 
 const questionsScreen =
-  document.getElementById(
-    "questions"
-  );
+  document.getElementById("questions");
 
 const lifeReveal =
-  document.getElementById(
-    "lifeReveal"
-  );
+  document.getElementById("lifeReveal");
 
 const continueBtn =
-  document.getElementById(
-    "continueBtn"
-  );
+  document.getElementById("continueBtn");
 
 const enterCity =
-  document.getElementById(
-    "enterCity"
+  document.getElementById("enterCity");
+
+const nicknameInput =
+  document.getElementById("nicknameInput");
+
+const ageInput =
+  document.getElementById("ageInput");
+
+const questionNumber =
+  document.getElementById("questionNumber");
+
+const questionText =
+  document.getElementById("questionText");
+
+const questionAnswers =
+  document.getElementById("questionAnswers");
+
+const revealFamily =
+  document.getElementById("revealFamily");
+
+const revealDescription =
+  document.getElementById("revealDescription");
+
+const revealFather =
+  document.getElementById("revealFather");
+
+const revealPosition =
+  document.getElementById("revealPosition");
+
+const toast =
+  document.getElementById("toast");
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+function showToast(message) {
+
+  if (!toast) {
+    console.log(message);
+    return;
+  }
+
+  toast.textContent = message;
+
+  toast.classList.remove("hidden");
+
+  clearTimeout(
+    showToast.timer
   );
+
+  showToast.timer =
+    setTimeout(() => {
+
+      toast.classList.add("hidden");
+
+    }, 3000);
+
+}
+
+
+/* =====================================================
+   GENDER
+===================================================== */
+
+const genderOptions =
+  document.querySelectorAll(
+    'input[name="gender"]'
+  );
+
+
+genderOptions.forEach(
+  input => {
+
+    input.addEventListener(
+      "change",
+      function () {
+
+        selectedGender =
+          this.value;
+
+        document
+          .querySelectorAll(
+            ".gender-card"
+          )
+          .forEach(card => {
+
+            card.classList.remove(
+              "selected"
+            );
+
+          });
+
+
+        const card =
+          this.closest(
+            ".gender-card"
+          );
+
+
+        if (card) {
+
+          card.classList.add(
+            "selected"
+          );
+
+        }
+
+      }
+    );
+
+  }
+);
+
+
+/* =====================================================
+   CONTINUE BUTTON
+===================================================== */
+
+if (continueBtn) {
+
+  continueBtn.addEventListener(
+    "click",
+    function () {
+
+      const nickname =
+        nicknameInput
+          ? nicknameInput.value.trim()
+          : "";
+
+      const age =
+        ageInput
+          ? Number(ageInput.value)
+          : 0;
+
+
+      const chosenGender =
+        document.querySelector(
+          'input[name="gender"]:checked'
+        );
+
+
+      if (!nickname) {
+
+        showToast(
+          "Enter the name people will call you."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !age ||
+        age < 16 ||
+        age > 80
+      ) {
+
+        showToast(
+          "Enter an age between 16 and 80."
+        );
+
+        return;
+
+      }
+
+
+      if (!chosenGender) {
+
+        showToast(
+          "Please select your gender."
+        );
+
+        return;
+
+      }
+
+
+      selectedGender =
+        chosenGender.value;
+
+
+      player.nickname =
+        nickname;
+
+      player.age =
+        age;
+
+      player.gender =
+        selectedGender;
+
+
+      if (basicInformation) {
+
+        basicInformation
+          .classList
+          .add("hidden");
+
+      }
+
+
+      if (questionsScreen) {
+
+        questionsScreen
+          .classList
+          .remove("hidden");
+
+      }
+
+
+      questionIndex = 0;
+
+      showQuestion();
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   SHOW QUESTION
+===================================================== */
+
+function showQuestion() {
+
+  if (
+    !questionsScreen ||
+    !questionText ||
+    !questionAnswers
+  ) {
+    return;
+  }
+
+
+  const question =
+    questions[
+      questionIndex
+    ];
+
+
+  if (!question) {
+
+    determineLife();
+
+    return;
+
+  }
+
+
+  if (questionNumber) {
+
+    questionNumber.textContent =
+      `QUESTION ${
+        questionIndex + 1
+      } OF ${
+        questions.length
+      }`;
+
+  }
+
+
+  questionText.textContent =
+    question.text;
+
+
+  questionAnswers.innerHTML =
+    "";
+
+
+  question.answers.forEach(
+    (answer, index) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+      button.className =
+        "answer-button";
+
+
+      button.textContent =
+        answer.text;
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          applyTraits(
+            answer.traits
+          );
+
+
+          questionIndex++;
+
+
+          if (
+            questionIndex >=
+            questions.length
+          ) {
+
+            determineLife();
+
+          } else {
+
+            showQuestion();
+
+          }
+
+        }
+      );
+
+
+      questionAnswers.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   APPLY HIDDEN TRAITS
+===================================================== */
+
+function applyTraits(traits) {
+
+  if (!traits) {
+    return;
+  }
+
+
+  Object.keys(traits)
+    .forEach(key => {
+
+      if (
+        typeof player.traits[key]
+        !== "number"
+      ) {
+
+        player.traits[key] = 0;
+
+      }
+
+
+      player.traits[key] +=
+        Number(traits[key]);
+
+    });
+
+}
+
+
+/* =====================================================
+   FIND AVAILABLE LIFE
+===================================================== */
+
+function findAvailableLife() {
+
+  const gender =
+    player.gender;
+
+
+  const possiblePositions = [
+
+    {
+      key: "eldest-daughter",
+      label: "ELDEST DAUGHTER"
+    },
+
+    {
+      key: "second-daughter",
+      label: "SECOND DAUGHTER"
+    },
+
+    {
+      key: "youngest-daughter",
+      label: "YOUNGEST DAUGHTER"
+    },
+
+    {
+      key: "eldest-son",
+      label: "ELDEST SON"
+    },
+
+    {
+      key: "second-son",
+      label: "SECOND SON"
+    },
+
+    {
+      key: "youngest-son",
+      label: "YOUNGEST SON"
+    }
+
+  ];
+
+
+  const genderPositions =
+    possiblePositions.filter(
+      position => {
+
+        if (
+          gender === "female"
+        ) {
+
+          return position.key
+            .includes("daughter");
+
+        }
+
+        return position.key
+          .includes("son");
+
+      }
+    );
+
+
+  const available = [];
+
+
+  families.forEach(
+    family => {
+
+      genderPositions.forEach(
+        position => {
+
+          const uniqueKey =
+            `${family.id}-${position.key}`;
+
+
+          if (
+            !population[uniqueKey]
+          ) {
+
+            available.push({
+
+              family,
+
+              position,
+
+              uniqueKey
+
+            });
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  if (!available.length) {
+
+    /*
+      If all six slots of every family
+      are occupied, create a normal
+      civilian life instead of breaking
+      the registration.
+    */
+
+    return {
+
+      family: {
+
+        id: "civilian",
+
+        surname: "Walker",
+
+        name: "THE CITY",
+
+        type: "Civilian",
+
+        description:
+          "You were born outside the powerful families. Your story begins with an ordinary life, but the city is full of opportunities.",
+
+        father: "Unknown",
+
+        mother: "Unknown",
+
+        money: 5000,
+
+        color: "#475569"
+
+      },
+
+      position: {
+
+        key: "civilian",
+
+        label: "ORDINARY CITIZEN"
+
+      },
+
+      uniqueKey:
+        `civilian-${Date.now()}`
+
+    };
+
+  }
+
+
+  /*
+    Score lives using hidden traits.
+
+    The player never sees these calculations.
+  */
+
+  const scored =
+    available.map(
+      life => {
+
+        let score =
+          Math.random() * 10;
+
+
+        const traits =
+          player.traits;
+
+
+        score +=
+          traits.ambition * 2;
+
+        score +=
+          traits.courage * 1.5;
+
+        score +=
+          traits.intelligence * 1.5;
+
+        score +=
+          traits.loyalty * 1.5;
+
+        score +=
+          traits.risk;
+
+
+        /*
+          Family tendencies.
+        */
+
+        if (
+          life.family.id ===
+          "varelli"
+        ) {
+
+          score +=
+            traits.intelligence * 2;
+
+        }
+
+
+        if (
+          life.family.id ===
+          "russo"
+        ) {
+
+          score +=
+            traits.courage;
+
+          score +=
+            traits.loyalty;
+
+        }
+
+
+        if (
+          life.family.id ===
+          "moretti"
+        ) {
+
+          score +=
+            traits.ambition * 2;
+
+        }
+
+
+        if (
+          life.family.id ===
+          "bellini"
+        ) {
+
+          score +=
+            traits.intelligence;
+
+          score +=
+            traits.ambition;
+
+        }
+
+
+        return {
+
+          ...life,
+
+          score
+
+        };
+
+      }
+    );
+
+
+  scored.sort(
+    (a, b) =>
+      b.score - a.score
+  );
+
+
+  /*
+    Add a little randomness so that
+    identical answers don't always create
+    identical lives.
+  */
+
+  const top =
+    scored.slice(
+      0,
+      Math.min(4, scored.length)
+    );
+
+
+  return top[
+    Math.floor(
+      Math.random() *
+      top.length
+    )
+  ];
+
+}
+
+
+/* =====================================================
+   DETERMINE LIFE
+===================================================== */
+
+function determineLife() {
+
+  const life =
+    findAvailableLife();
+
+
+  if (!life) {
+
+    showToast(
+      "The city could not create your life."
+    );
+
+    return;
+
+  }
+
+
+  const family =
+    life.family;
+
+
+  player.surname =
+    family.surname;
+
+
+  player.family =
+    family.name;
+
+
+  player.familyType =
+    family.type;
+
+
+  player.familyDescription =
+    family.description;
+
+
+  player.position =
+    life.position.label;
+
+
+  player.father =
+    family.father;
+
+
+  player.mother =
+    family.mother;
+
+
+  player.money =
+    family.money;
+
+
+  player.identity =
+    `${player.nickname} ${player.surname}`;
+
+
+  player.id =
+    `LC-${Date.now()}-${Math.floor(
+      Math.random() * 10000
+    )}`;
+
+
+  /*
+    Reserve this family position.
+  */
+
+  population[
+    life.uniqueKey
+  ] = {
+
+    playerId:
+      player.id,
+
+    nickname:
+      player.nickname,
+
+    gender:
+      player.gender,
+
+    position:
+      player.position,
+
+    family:
+      player.family
+
+  };
+
+
+  saveGame();
+
+
+  if (questionsScreen) {
+
+    questionsScreen
+      .classList
+      .add("hidden");
+
+  }
+
+
+  showLifeReveal();
+
+}
+
+
+/* =====================================================
+   LIFE REVEAL
+===================================================== */
+
+function showLifeReveal() {
+
+  if (lifeReveal) {
+
+    lifeReveal
+      .classList
+      .remove("hidden");
+
+  }
+
+
+  if (revealFamily) {
+
+    revealFamily.textContent =
+      player.family;
+
+  }
+
+
+  if (revealDescription) {
+
+    revealDescription.textContent =
+      player.familyDescription;
+
+  }
+
+
+  if (revealFather) {
+
+    revealFather.textContent =
+      player.father;
+
+  }
+
+
+  if (revealPosition) {
+
+    revealPosition.textContent =
+      player.position;
+
+  }
+
+}
+
+
+/* =====================================================
+   ENTER CITY
+===================================================== */
+
+if (enterCity) {
+
+  enterCity.addEventListener(
+    "click",
+    enterTheCity
+  );
+
+}
+
+
+function enterTheCity() {
+
+  if (registration) {
+
+    registration
+      .classList
+      .add("hidden");
+
+  }
+
+
+  Game.gameStarted =
+    true;
+
+
+  saveGame();
+
+
+  if (!Game.engine) {
+
+    initializeEngine();
+
+  }
+
+
+  updatePlayerInterface();
+
+
+  showToast(
+    `Welcome to Life City, ${player.nickname}.`
+  );
+
+}
 
 
 /* =====================================================
@@ -701,6 +1392,17 @@ const enterCity =
 
 function initializeEngine() {
 
+  if (!canvas) {
+
+    console.error(
+      "gameCanvas was not found."
+    );
+
+    return;
+
+  }
+
+
   Game.engine =
     new BABYLON.Engine(
       canvas,
@@ -708,923 +1410,4 @@ function initializeEngine() {
       {
         preserveDrawingBuffer: true,
         stencil: true
-      },
-      true
-    );
-
-
-  Game.scene =
-    new BABYLON.Scene(
-      Game.engine
-    );
-
-
-  Game.scene.clearColor =
-    new BABYLON.Color4(
-      0.035,
-      0.05,
-      0.07,
-      1
-    );
-
-
-  createCamera();
-
-  createLighting();
-
-  createCity();
-
-  createPlayer();
-
-  createNPCs();
-
-  setupInput();
-
-  setupMobileControls();
-
-  Game.engine.runRenderLoop(
-    gameLoop
-  );
-
-
-  window.addEventListener(
-    "resize",
-    () => {
-      Game.engine.resize();
-    }
-  );
-
-}
-
-
-/* =====================================================
-   CAMERA
-===================================================== */
-
-function createCamera() {
-
-  Game.camera =
-    new BABYLON.FollowCamera(
-      "followCamera",
-      new BABYLON.Vector3(
-        0,
-        8,
-        -12
-      ),
-      Game.scene
-    );
-
-
-  Game.camera.radius = 11;
-
-  Game.camera.heightOffset = 7;
-
-  Game.camera.rotationOffset = 180;
-
-  Game.camera.cameraAcceleration = .05;
-
-  Game.camera.maxCameraSpeed = 15;
-
-  Game.camera.fov = .8;
-
-}
-
-
-/* =====================================================
-   LIGHT
-===================================================== */
-
-function createLighting() {
-
-  const light =
-    new BABYLON.HemisphericLight(
-      "cityLight",
-      new BABYLON.Vector3(
-        0,
-        1,
-        0
-      ),
-      Game.scene
-    );
-
-  light.intensity = 1.15;
-
-
-  const sun =
-    new BABYLON.DirectionalLight(
-      "sun",
-      new BABYLON.Vector3(
-        -0.5,
-        -1,
-        -0.5
-      ),
-      Game.scene
-    );
-
-  sun.intensity = .8;
-
-}
-
-
-/* =====================================================
-   MATERIAL
-===================================================== */
-
-function material(
-  name,
-  color
-) {
-
-  const mat =
-    new BABYLON.StandardMaterial(
-      name,
-      Game.scene
-    );
-
-  mat.diffuseColor =
-    BABYLON.Color3.FromHexString(
-      color
-    );
-
-  return mat;
-
-}
-
-
-/* =====================================================
-   CITY
-===================================================== */
-
-function createCity() {
-
-  const ground =
-    BABYLON.MeshBuilder.CreateGround(
-      "cityGround",
-      {
-        width: 120,
-        height: 120
-      },
-      Game.scene
-    );
-
-  ground.material =
-    material(
-      "groundMat",
-      "#24352d"
-    );
-
-
-  /* ROAD */
-
-  createBox(
-    "mainRoad",
-    120,
-    .15,
-    10,
-    0,
-    .05,
-    0,
-    "#252a32"
-  );
-
-
-  createBox(
-    "crossRoad",
-    10,
-    .16,
-    120,
-    0,
-    .06,
-    0,
-    "#252a32"
-  );
-
-
-  /* CITY BLOCKS */
-
-  createBuilding(
-    "Market",
-    -25,
-    4,
-    -25,
-    14,
-    8,
-    14,
-    "#7c3aed"
-  );
-
-
-  createBuilding(
-    "Cafe",
-    25,
-    3,
-    -25,
-    12,
-    6,
-    12,
-    "#92400e"
-  );
-
-
-  createBuilding(
-    "Police Station",
-    -25,
-    4,
-    25,
-    15,
-    8,
-    12,
-    "#334155"
-  );
-
-
-  createBuilding(
-    "Hospital",
-    25,
-    5,
-    25,
-    15,
-    10,
-    13,
-    "#e5e7eb"
-  );
-
-
-  createBuilding(
-    "City Hall",
-    0,
-    5,
-    38,
-    20,
-    10,
-    12,
-    "#64748b"
-  );
-
-
-  /* HOUSES */
-
-  createHouse(
-    -42,
-    -40,
-    "Russo Estate",
-    "#7f1d1d",
-    "Mansion"
-  );
-
-
-  createHouse(
-    42,
-    -40,
-    "Varelli Estate",
-    "#312e81",
-    "Mansion"
-  );
-
-
-  createHouse(
-    -42,
-    40,
-    "Moretti Estate",
-    "#78350f",
-    "Luxury Estate"
-  );
-
-
-  createHouse(
-    42,
-    40,
-    "Bellini Estate",
-    "#581c87",
-    "Luxury Estate"
-  );
-
-
-  /* PARK */
-
-  createPark(
-    0,
-    -35
-  );
-
-}
-
-
-/* =====================================================
-   BOX
-===================================================== */
-
-function createBox(
-  name,
-  width,
-  height,
-  depth,
-  x,
-  y,
-  z,
-  color
-) {
-
-  const mesh =
-    BABYLON.MeshBuilder.CreateBox(
-      name,
-      {
-        width,
-        height,
-        depth
-      },
-      Game.scene
-    );
-
-  mesh.position =
-    new BABYLON.Vector3(
-      x,
-      y,
-      z
-    );
-
-  mesh.material =
-    material(
-      name + "Material",
-      color
-    );
-
-  return mesh;
-
-}
-
-
-/* =====================================================
-   BUILDING
-===================================================== */
-
-function createBuilding(
-  name,
-  x,
-  y,
-  z,
-  width,
-  height,
-  depth,
-  color
-) {
-
-  const building =
-    createBox(
-      name,
-      width,
-      height,
-      depth,
-      x,
-      y,
-      z,
-      color
-    );
-
-  Game.buildings.push(
-    building
-  );
-
-
-  const sign =
-    BABYLON.MeshBuilder.CreatePlane(
-      name + "Sign",
-      {
-        width: 6,
-        height: 1.5
-      },
-      Game.scene
-    );
-
-  sign.position =
-    new BABYLON.Vector3(
-      x,
-      height + 1,
-      z - depth / 2 - .1
-    );
-
-  const signMat =
-    new BABYLON.StandardMaterial(
-      name + "SignMaterial",
-      Game.scene
-    );
-
-  signMat.diffuseColor =
-    BABYLON.Color3.FromHexString(
-      "#111827"
-    );
-
-  sign.material =
-    signMat;
-
-
-  return building;
-
-}
-
-
-/* =====================================================
-   HOUSE
-===================================================== */
-
-function createHouse(
-  x,
-  z,
-  name,
-  color,
-  type
-) {
-
-  const house =
-    createBuilding(
-      name,
-      x,
-      4,
-      z,
-      type === "Luxury Estate"
-        ? 18
-        : 15,
-      8,
-      type === "Luxury Estate"
-        ? 18
-        : 15,
-      color
-    );
-
-
-  house.metadata = {
-
-    house: true,
-
-    houseName: name,
-
-    houseType: type
-
-  };
-
-}
-
-
-/* =====================================================
-   PARK
-===================================================== */
-
-function createPark(
-  x,
-  z
-) {
-
-  const grass =
-    createBox(
-      "Park",
-      25,
-      .2,
-      20,
-      x,
-      .1,
-      z,
-      "#166534"
-    );
-
-
-  for (
-    let i = 0;
-    i < 8;
-    i++
-  ) {
-
-    const tree =
-      BABYLON.MeshBuilder.CreateCylinder(
-        "TreeTrunk",
-        {
-          diameter: .7,
-          height: 3
-        },
-        Game.scene
-      );
-
-    tree.position =
-      new BABYLON.Vector3(
-        x + Math.random() * 20 - 10,
-        1.5,
-        z + Math.random() * 16 - 8
-      );
-
-    tree.material =
-      material(
-        "trunk" + i,
-        "#78350f"
-      );
-
-
-    const leaves =
-      BABYLON.MeshBuilder.CreateSphere(
-        "TreeLeaves",
-        {
-          diameter: 3
-        },
-        Game.scene
-      );
-
-    leaves.position =
-      tree.position.clone();
-
-    leaves.position.y = 3.5;
-
-    leaves.material =
-      material(
-        "leaves" + i,
-        "#15803d"
-      );
-
-  }
-
-}
-
-
-/* =====================================================
-   3D PLAYER
-===================================================== */
-
-function createPlayer() {
-
-  const root =
-    new BABYLON.TransformNode(
-      "Player",
-      Game.scene
-    );
-
-
-  const skin =
-    material(
-      "playerSkin",
-      player.gender === "male"
-        ? "#a86f52"
-        : "#9a6249"
-    );
-
-
-  const clothes =
-    material(
-      "playerClothes",
-      "#0f766e"
-    );
-
-
-  const head =
-    BABYLON.MeshBuilder.CreateSphere(
-      "PlayerHead",
-      {
-        diameter: 1.1
-      },
-      Game.scene
-    );
-
-  head.parent = root;
-
-  head.position.y = 2.65;
-
-  head.material = skin;
-
-
-  const body =
-    createBox(
-      "PlayerBody",
-      1.05,
-      1.45,
-      .65,
-      0,
-      1.65,
-      0,
-      "#0f766e"
-    );
-
-  body.parent = root;
-
-  body.position =
-    new BABYLON.Vector3(
-      0,
-      1.65,
-      0
-    );
-
-
-  const leftLeg =
-    createBox(
-      "LeftLeg",
-      .35,
-      1.25,
-      .4,
-      0,
-      0,
-      0,
-      "#172033"
-    );
-
-  leftLeg.parent = root;
-
-  leftLeg.position =
-    new BABYLON.Vector3(
-      -.27,
-      .55,
-      0
-    );
-
-
-  const rightLeg =
-    createBox(
-      "RightLeg",
-      .35,
-      1.25,
-      .4,
-      0,
-      0,
-      0,
-      "#172033"
-    );
-
-  rightLeg.parent = root;
-
-  rightLeg.position =
-    new BABYLON.Vector3(
-      .27,
-      .55,
-      0
-    );
-
-
-  Game.playerMesh =
-    root;
-
-  Game.playerParts = {
-
-    head,
-
-    body,
-
-    leftLeg,
-
-    rightLeg
-
-  };
-
-
-  Game.camera.lockedTarget =
-    root;
-
-
-  root.position =
-    new BABYLON.Vector3(
-      0,
-      0,
-      0
-    );
-
-}
-
-
-/* =====================================================
-   NPC
-===================================================== */
-
-function createNPC(
-  x,
-  z,
-  name
-) {
-
-  const root =
-    new BABYLON.TransformNode(
-      "NPC_" + name,
-      Game.scene
-    );
-
-
-  const skin =
-    material(
-      "npcSkin" + name,
-      "#a56a4e"
-    );
-
-
-  const head =
-    BABYLON.MeshBuilder.CreateSphere(
-      "npcHead" + name,
-      {
-        diameter: .9
-      },
-      Game.scene
-    );
-
-  head.parent = root;
-
-  head.position.y = 2.3;
-
-  head.material = skin;
-
-
-  const body =
-    createBox(
-      "npcBody" + name,
-      .9,
-      1.3,
-      .6,
-      0,
-      1.35,
-      0,
-      "#475569"
-    );
-
-  body.parent = root;
-
-
-  root.position =
-    new BABYLON.Vector3(
-      x,
-      0,
-      z
-    );
-
-
-  Game.npcs.push({
-
-    mesh: root,
-
-    name,
-
-    direction:
-      Math.random() * Math.PI * 2,
-
-    timer: 0
-
-  });
-
-}
-
-
-/* =====================================================
-   NPCS
-===================================================== */
-
-function createNPCs() {
-
-  const names = [
-
-    "Ayo",
-    "Maya",
-    "David",
-    "Lena",
-    "Marcus",
-    "Tobi",
-    "Nora",
-    "Daniel"
-
-  ];
-
-
-  names.forEach(
-    (name, index) => {
-
-      createNPC(
-        Math.random() * 50 - 25,
-        Math.random() * 50 - 25,
-        name + index
-      );
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   INPUT
-===================================================== */
-
-function setupInput() {
-
-  window.addEventListener(
-    "keydown",
-    event => {
-
-      Game.keys[
-        event.key.toLowerCase()
-      ] = true;
-
-
-      if (
-        event.key.toLowerCase() === "e"
-      ) {
-
-        interact();
-
-      }
-
-
-      if (
-        event.key.toLowerCase() === "f"
-      ) {
-
-        fireWeapon();
-
-      }
-
-
-      if (
-        event.key.toLowerCase() === "p"
-      ) {
-
-        togglePhone();
-
-      }
-
-    }
-  );
-
-
-  window.addEventListener(
-    "keyup",
-    event => {
-
-      Game.keys[
-        event.key.toLowerCase()
-      ] = false;
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   MOBILE CONTROLS
-===================================================== */
-
-function setupMobileControls() {
-
-  document
-    .querySelectorAll(
-      "[data-move]"
-    )
-    .forEach(button => {
-
-      const direction =
-        button.dataset.move;
-
-
-      const start =
-        event => {
-
-          event.preventDefault();
-
-          if (
-            direction === "up"
-          ) Game.movement.z = 1;
-
-          if (
-            direction === "down"
-          ) Game.movement.z = -1;
-
-          if (
-            direction === "left"
-          ) Game.movement.x = -1;
-
-          if (
-            direction === "right"
-          ) Game.movement.x = 1;
-
-        };
-
-
-      const stop =
-        event => {
-
-          event.preventDefault();
-
-          if (
-            direction === "up" ||
-            direction === "down"
-          ) {
-
-            Game.movement.z = 0;
-
-          }
-
-          if (
-            direction === "left" ||
-            direction === "right"
-          ) {
-
-            Game.movement.x = 0;
-
-          }
-
-        };
-
-
-      button.addEventListener(
-        "pointerdown",
-        start
-      );
-
-      button.addEventList
+     
