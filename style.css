@@ -814,7 +814,7 @@ button {
     height: calc(100dvh - 16px);
   }
 
-  .hud-card {
+  .hud-card {ù
     padding: 7px;
   }
 
@@ -828,3 +828,27 @@ button {
   }
 
   }
+/* =====================================================
+   REGISTRATION CLICK SAFETY
+===================================================== */
+
+.registration-overlay {
+  pointer-events: auto;
+}
+
+.registration-card,
+.registration-card button,
+.registration-card input,
+.registration-card label {
+  pointer-events: auto;
+}
+
+.primary-button {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
