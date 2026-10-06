@@ -1,1031 +1,655 @@
+/* =====================================================
+   LIFE CITY
+   COMPLETE 3D GAME UI
+===================================================== */
+
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-:root {
-  --black: #090b0d;
-  --dark: #121519;
-  --panel: #1d2228;
-  --panel-light: #292f36;
-  --cream: #f4eee3;
-  --gold: #d7ad61;
-  --muted: #9da4aa;
-  --green: #59c48a;
-  --blue: #65a8e6;
-  --orange: #e29a4e;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
   width: 100%;
   height: 100%;
-
+  margin: 0;
   overflow: hidden;
-
-  background: var(--black);
-
-  color: white;
-
+  background: #05070a;
+  color: #fff;
   font-family:
-    Arial,
-    Helvetica,
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
 }
 
-
-/* =========================
-   GAME
-========================= */
-
-#game {
-  width: 100vw;
-  height: 100dvh;
-
-  position: fixed;
-  inset: 0;
-
-  overflow: hidden;
-}
-
-.world {
-  width: 100%;
-  height: 100%;
-
-  position: relative;
-
-  overflow: hidden;
-}
-
-#gameCanvas {
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
+body {
   touch-action: none;
 }
 
-
-/* =========================
-   DEVICE STATUS
-========================= */
-
-.device-status {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  width: 100%;
-
-  height: 30px;
-
-  padding: 0 15px;
-
-  display: flex;
-
-  justify-content: space-between;
-  align-items: center;
-
-  z-index: 20;
-
-  font-size: 11px;
-
-  color: white;
-
-  pointer-events: none;
-
-  background: rgba(8, 10, 12, .48);
+button,
+input {
+  font: inherit;
 }
 
-.device-icons {
-  display: flex;
-  gap: 8px;
-
-  font-size: 9px;
-}
-
-
-/* =========================
-   WORLD INFO
-========================= */
-
-.world-info {
-  position: absolute;
-
-  top: 42px;
-  left: 14px;
-  right: 14px;
-
-  display: flex;
-
-  justify-content: space-between;
-  align-items: flex-start;
-
-  pointer-events: none;
-
-  z-index: 10;
-}
-
-.world-info strong {
-  display: block;
-
-  font-size: 12px;
-
-  letter-spacing: 1px;
-}
-
-.world-info small {
-  display: block;
-
-  margin-top: 3px;
-
-  color: rgba(255,255,255,.7);
-
-  font-size: 10px;
-}
-
-.money-display {
-  padding: 7px 11px;
-
-  border-radius: 20px;
-
-  background: rgba(8,10,12,.65);
-
-  color: var(--gold);
-
-  font-weight: bold;
-
-  font-size: 12px;
-}
-
-
-/* =========================
-   NEEDS
-========================= */
-
-.needs {
-  position: absolute;
-
-  top: 82px;
-  left: 14px;
-
-  padding: 9px;
-
-  background: rgba(8,10,12,.65);
-
-  border-radius: 12px;
-
-  z-index: 10;
-
-  pointer-events: none;
-}
-
-.need {
-  display: flex;
-
-  align-items: center;
-
-  gap: 6px;
-
-  margin-bottom: 5px;
-}
-
-.need:last-child {
-  margin-bottom: 0;
-}
-
-.need span {
-  font-size: 12px;
-}
-
-.need-bar {
-  width: 70px;
-  height: 6px;
-
-  overflow: hidden;
-
-  border-radius: 20px;
-
-  background: #3a4046;
-}
-
-.need-fill {
-  height: 100%;
-
-  width: 100%;
-
-  border-radius: inherit;
-
-  transition: width .3s;
-}
-
-.hunger {
-  background: var(--orange);
-}
-
-.energy {
-  background: var(--blue);
-}
-
-.hygiene {
-  background: var(--green);
-}
-
-
-/* =========================
-   PHONE OPEN
-========================= */
-
-.phone-open {
-  position: absolute;
-
-  right: 18px;
-  bottom: 18px;
-
-  width: 54px;
-  height: 54px;
-
-  border: 1px solid rgba(255,255,255,.12);
-
-  border-radius: 50%;
-
-  background: rgba(15,18,21,.9);
-
-  color: white;
-
-  font-size: 22px;
-
-  z-index: 25;
-
+button {
   cursor: pointer;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.35);
+  border: 0;
 }
-
-
-/* =========================
-   PHONE
-========================= */
-
-.phone {
-  position: absolute;
-
-  z-index: 40;
-
-  right: 18px;
-  bottom: 18px;
-
-  width: min(350px, calc(100vw - 36px));
-  height: min(680px, calc(100dvh - 36px));
-
-  background: #111418;
-
-  border: 4px solid #2a2f35;
-
-  border-radius: 34px;
-
-  overflow: hidden;
-
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.65);
-
-  transform: translateY(0);
-
-  transition:
-    transform .3s ease,
-    opacity .3s ease;
-}
-
-.phone.hidden {
-  transform: translateY(calc(100% + 40px));
-
-  opacity: 0;
-
-  pointer-events: none;
-}
-
-.phone-notch {
-  position: absolute;
-
-  top: 7px;
-  left: 50%;
-
-  transform: translateX(-50%);
-
-  width: 90px;
-  height: 20px;
-
-  border-radius: 20px;
-
-  background: #050607;
-
-  z-index: 20;
-}
-
-.phone-status {
-  height: 35px;
-
-  display: flex;
-
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 0 15px;
-
-  background: #121519;
-
-  font-size: 10px;
-
-  color: white;
-}
-
-.phone-page {
-  position: absolute;
-
-  top: 35px;
-  bottom: 53px;
-
-  left: 0;
-  right: 0;
-
-  overflow-y: auto;
-
-  background:
-    radial-gradient(
-      circle at top right,
-      #30363d,
-      transparent 45%
-    ),
-    #181c21;
-}
-
-.phone-wallpaper {
-  min-height: 100%;
-
-  padding: 22px 18px;
-}
-
-.phone-profile-mini {
-  display: flex;
-
-  align-items: center;
-
-  gap: 11px;
-
-  margin-bottom: 30px;
-}
-
-.mini-avatar {
-  width: 45px;
-  height: 45px;
-
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 50%;
-
-  background: #30363d;
-
-  font-size: 22px;
-}
-
-.phone-profile-mini small {
-  display: block;
-
-  margin-top: 4px;
-
-  color: var(--muted);
-
-  font-size: 10px;
-}
-
-
-/* =========================
-   APP GRID
-========================= */
-
-.app-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 19px 12px;
-}
-
-.app {
-  border: none;
-
-  background: transparent;
-
-  color: white;
-
-  cursor: pointer;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  gap: 6px;
-}
-
-.app span {
-  width: 56px;
-  height: 56px;
-
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 16px;
-
-  background: #292f36;
-
-  font-size: 24px;
-
-  transition: transform .2s;
-}
-
-.app:active span {
-  transform: scale(.9);
-}
-
-.app small {
-  color: #ddd;
-
-  font-size: 10px;
-}
-
-
-/* =========================
-   APP PAGE
-========================= */
-
-.app-page {
-  padding: 18px;
-}
-
-.app-back {
-  width: 34px;
-  height: 34px;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background: #2b3037;
-
-  color: white;
-
-  font-size: 24px;
-
-  cursor: pointer;
-
-  margin-bottom: 15px;
-}
-
-.app-page h2 {
-  margin-bottom: 18px;
-
-  font-family: Georgia, serif;
-}
-
-.app-card {
-  padding: 15px;
-
-  margin-bottom: 12px;
-
-  border-radius: 14px;
-
-  background: #242930;
-}
-
-.app-card strong {
-  display: block;
-
-  margin-bottom: 6px;
-}
-
-.app-card p {
-  color: var(--muted);
-
-  line-height: 1.55;
-
-  font-size: 13px;
-}
-
-.app-action {
-  width: 100%;
-
-  padding: 11px;
-
-  margin-top: 12px;
-
-  border: none;
-
-  border-radius: 9px;
-
-  background: var(--gold);
-
-  color: #18130b;
-
-  font-weight: bold;
-
-  cursor: pointer;
-}
-
-
-/* =========================
-   PHONE BOTTOM
-========================= */
-
-.phone-bottom {
-  position: absolute;
-
-  bottom: 0;
-  left: 0;
-
-  width: 100%;
-  height: 53px;
-
-  display: flex;
-
-  justify-content: space-around;
-  align-items: center;
-
-  background: #111418;
-
-  border-top: 1px solid rgba(255,255,255,.08);
-}
-
-.phone-bottom button {
-  border: none;
-
-  background: none;
-
-  color: #b7bcc1;
-
-  font-size: 19px;
-
-  cursor: pointer;
-}
-
-.phone-bottom small {
-  display: block;
-
-  font-size: 8px;
-
-  margin-top: 2px;
-}
-
-
-/* =========================
-   MOVEMENT
-========================= */
-
-.movement {
-  position: absolute;
-
-  left: 14px;
-  bottom: 18px;
-
-  z-index: 15;
-}
-
-.movement button {
-  width: 43px;
-  height: 43px;
-
-  margin: 2px;
-
-  border: none;
-
-  border-radius: 12px;
-
-  background: rgba(15,18,21,.72);
-
-  color: white;
-
-  font-size: 17px;
-
-  touch-action: none;
-}
-
-
-/* =========================
-   REGISTRATION
-========================= */
-
-.registration {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 100;
-
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  padding: 18px;
-
-  background:
-    radial-gradient(
-      circle at 50% 20%,
-      #403333,
-      transparent 50%
-    ),
-    #0a0c0e;
-
-  overflow-y: auto;
-}
-
-.registration-card {
-  width: min(590px, 100%);
-
-  max-height: 94dvh;
-
-  overflow-y: auto;
-
-  padding: 34px;
-
-  border-radius: 26px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(31,35,40,.97),
-      rgba(18,21,24,.97)
-    );
-
-  border: 1px solid rgba(255,255,255,.08);
-
-  box-shadow:
-    0 35px 100px rgba(0,0,0,.55);
-}
-
-.registration-step {
-  color: var(--gold);
-
-  font-size: 10px;
-
-  letter-spacing: 3px;
-
-  margin-bottom: 15px;
-}
-
-.registration-card h1 {
-  font-family: Georgia, serif;
-
-  font-size: clamp(31px, 7vw, 52px);
-
-  line-height: 1.05;
-
-  margin-bottom: 15px;
-}
-
-.registration-card > p {
-  color: var(--muted);
-
-  line-height: 1.65;
-
-  margin-bottom: 25px;
-}
-
-.registration-content label {
-  display: block;
-
-  color: #ddd;
-
-  font-size: 13px;
-
-  margin:
-    18px 0 7px;
-}
-
-.registration-content input {
-  width: 100%;
-
-  padding: 14px;
-
-  border: 1px solid #3b4148;
-
-  border-radius: 11px;
-
-  outline: none;
-
-  background: #15191d;
-
-  color: white;
-
-  font-size: 15px;
-}
-
-.registration-content input:focus {
-  border-color: var(--gold);
-}
-
-.gender-options {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 10px;
-}
-
-.gender-options button {
-  padding: 13px;
-
-  border: 1px solid #3b4148;
-
-  border-radius: 11px;
-
-  background: #20252b;
-
-  color: white;
-
-  cursor: pointer;
-}
-
-.gender-options button.selected {
-  border-color: var(--gold);
-
-  background: #3b3325;
-}
-
-.primary-button {
-  width: 100%;
-
-  padding: 14px;
-
-  margin-top: 22px;
-
-  border: none;
-
-  border-radius: 11px;
-
-  background: var(--gold);
-
-  color: #17130d;
-
-  font-weight: bold;
-
-  cursor: pointer;
-
-  font-size: 14px;
-}
-
-
-/* =========================
-   QUESTIONS
-========================= */
-
-.question-number {
-  color: var(--gold);
-
-  font-size: 11px;
-
-  letter-spacing: 1px;
-
-  margin-bottom: 10px;
-}
-
-#questionText {
-  font-family: Georgia, serif;
-
-  font-size: 23px;
-
-  line-height: 1.4;
-
-  margin-bottom: 20px;
-}
-
-.question-answers {
-  display: grid;
-
-  gap: 10px;
-}
-
-.question-answer {
-  padding: 15px;
-
-  text-align: left;
-
-  border: 1px solid #3b4148;
-
-  border-radius: 12px;
-
-  background: #20252b;
-
-  color: white;
-
-  cursor: pointer;
-
-  line-height: 1.45;
-
-  transition: .2s;
-}
-
-.question-answer:hover {
-  border-color: var(--gold);
-
-  transform: translateY(-2px);
-}
-
-
-/* =========================
-   LIFE REVEAL
-========================= */
-
-.reveal-label {
-  color: var(--gold);
-
-  letter-spacing: 3px;
-
-  font-size: 11px;
-
-  margin-bottom: 18px;
-}
-
-#lifeReveal h2 {
-  font-family: Georgia, serif;
-
-  font-weight: normal;
-
-  color: #ddd;
-
-  margin-bottom: 15px;
-}
-
-#revealFamily {
-  font-family: Georgia, serif;
-
-  font-size: clamp(34px, 8vw, 58px);
-
-  line-height: 1;
-
-  color: var(--cream);
-
-  margin-bottom: 18px;
-}
-
-#revealDescription {
-  color: var(--muted);
-
-  line-height: 1.7;
-}
-
-.reveal-divider {
-  height: 1px;
-
-  background: rgba(255,255,255,.1);
-
-  margin: 25px 0;
-}
-
-#lifeReveal p:not(#revealDescription) {
-  color: #999;
-
-  font-size: 12px;
-
-  margin-top: 14px;
-}
-
-#revealFather,
-#revealPosition {
-  color: var(--cream);
-
-  font-family: Georgia, serif;
-
-  font-size: 21px;
-
-  margin-top: 5px;
-}
-
-
-/* =========================
-   TOAST
-========================= */
-
-.toast {
-  position: fixed;
-
-  left: 50%;
-  top: 40px;
-
-  transform:
-    translate(-50%, -20px);
-
-  opacity: 0;
-
-  z-index: 300;
-
-  padding: 10px 17px;
-
-  border-radius: 30px;
-
-  background: #20252b;
-
-  color: white;
-
-  font-size: 12px;
-
-  transition: .25s;
-}
-
-.toast.show {
-  opacity: 1;
-
-  transform:
-    translate(-50%, 0);
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-  .phone {
-    right: 10px;
-    bottom: 10px;
-
-    width: calc(100vw - 20px);
-    height: calc(100dvh - 20px);
-
-    border-radius: 27px;
-  }
-
-  .phone-open {
-    right: 15px;
-    bottom: 15px;
-  }
-
-  .registration {
-    align-items: flex-start;
-
-    padding-top: 20px;
-  }
-
-  .registration-card {
-    padding: 25px 19px;
-
-    border-radius: 20px;
-
-    max-height: none;
-
-    min-height: calc(100dvh - 40px);
-  }
-
-  .registration-card h1 {
-    font-size: 38px;
-  }
-
-  .movement button {
-    width: 42px;
-    height: 42px;
-  }
-}
-
-
-/* =========================
-   HIDDEN
-========================= */
 
 .hidden {
   display: none !important;
 }
 
-.gender-options {
-  display: flex;
-  gap: 12px;
+
+/* =====================================================
+   GAME
+===================================================== */
+
+#game {
   width: 100%;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+  background: #05070a;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+#worldHUD {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-top {
+  position: absolute;
+  top: env(safe-area-inset-top, 10px);
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.hud-card {
+  padding: 8px 11px;
+  border-radius: 12px;
+  background: rgba(5, 8, 12, 0.72);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.1);
+  min-width: 72px;
+}
+
+.location-card {
+  flex: 1;
+}
+
+.hud-label {
+  display: block;
+  font-size: 8px;
+  color: rgba(255,255,255,.55);
+  letter-spacing: 1.3px;
+  margin-bottom: 2px;
+}
+
+.hud-card strong {
+  font-size: 12px;
+}
+
+.money-card strong {
+  color: #d9f99d;
+}
+
+
+/* =====================================================
+   NEEDS
+===================================================== */
+
+.needs-panel {
+  position: absolute;
+  left: 12px;
+  bottom: 105px;
+  width: 145px;
+  padding: 9px;
+  border-radius: 14px;
+  background: rgba(5,8,12,.75);
+  backdrop-filter: blur(10px);
+}
+
+.need-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 5px 0;
+}
+
+.need-row > span {
+  width: 18px;
+  font-size: 13px;
+}
+
+.need-track {
+  height: 6px;
+  flex: 1;
+  background: rgba(255,255,255,.15);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.need-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  transition: width .3s ease;
+}
+
+.hunger {
+  background: #f59e0b;
+}
+
+.energy {
+  background: #22c55e;
+}
+
+.hygiene {
+  background: #38bdf8;
+}
+
+
+/* =====================================================
+   WANTED
+===================================================== */
+
+.wanted-panel {
+  position: absolute;
+  top: 100px;
+  right: 15px;
+  background: rgba(90,0,0,.75);
+  border: 1px solid rgba(255,100,100,.3);
+  padding: 9px 13px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.wanted-panel span {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.wanted-panel div {
+  color: #f87171;
+  letter-spacing: 2px;
+}
+
+
+/* =====================================================
+   WORLD MESSAGE
+===================================================== */
+
+.world-message {
+  position: absolute;
+  left: 50%;
+  bottom: 95px;
+  transform: translateX(-50%);
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(5,8,12,.82);
+  backdrop-filter: blur(12px);
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .3s ease;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.world-message.show {
+  opacity: 1;
+}
+
+
+/* =====================================================
+   PHONE BUTTON
+===================================================== */
+
+.floating-phone {
+  position: absolute;
+  z-index: 50;
+  right: 18px;
+  bottom: 22px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f8fafc;
+  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+  font-size: 24px;
+}
+
+
+/* =====================================================
+   MOBILE CONTROLS
+===================================================== */
+
+.mobile-controls {
+  position: absolute;
+  inset: auto 0 0;
+  height: 150px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.movement-pad {
+  position: absolute;
+  left: 15px;
+  bottom: 15px;
+  pointer-events: auto;
+}
+
+.movement-pad button {
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  border-radius: 10px;
+  color: #fff;
+  background: rgba(5,8,12,.72);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.movement-pad > button {
+  display: block;
+  margin: 0 auto 2px;
+}
+
+.movement-middle {
+  display: flex;
+}
+
+.action-pad {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  gap: 7px;
+  pointer-events: auto;
+}
+
+.action-pad button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(5,8,12,.78);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.15);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   PHONE
+===================================================== */
+
+.phone {
+  position: absolute;
+  z-index: 100;
+  right: 18px;
+  bottom: 18px;
+  width: min(380px, calc(100vw - 28px));
+  height: min(720px, calc(100dvh - 35px));
+}
+
+.phone-shell {
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+  border-radius: 35px;
+  background: #11151b;
+  border: 1px solid #303640;
+  box-shadow: 0 25px 70px rgba(0,0,0,.65);
+}
+
+.phone-speaker {
+  position: absolute;
+  z-index: 3;
+  top: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 18px;
+  border-radius: 20px;
+  background: #030405;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  border-radius: 29px;
+  background:
+    radial-gradient(
+      circle at top right,
+      #134e4a,
+      transparent 45%
+    ),
+    linear-gradient(
+      150deg,
+      #111827,
+      #030712
+    );
+}
+
+.phone-status {
+  height: 42px;
+  padding: 15px 17px 5px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255,255,255,.8);
+}
+
+.phone-page {
+  position: absolute;
+  inset: 42px 0 57px;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.phone-header {
+  margin-bottom: 24px;
+}
+
+.mini-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-avatar {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#14b8a6,#0f766e);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.mini-profile strong {
+  display: block;
+}
+
+.mini-profile small {
+  color: rgba(255,255,255,.55);
+}
+
+
+/* =====================================================
+   APP GRID
+===================================================== */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 10px;
+}
+
+.app-icon {
+  min-height: 85px;
+  border-radius: 17px;
+  background: rgba(255,255,255,.07);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.app-icon span {
+  font-size: 27px;
+}
+
+.app-icon small {
+  font-size: 10px;
+  color: rgba(255,255,255,.7);
+}
+
+.special-app {
+  background: linear-gradient(
+    145deg,
+    rgba(236,72,153,.25),
+    rgba(168,85,247,.15)
+  );
+}
+
+.combat-app {
+  background: linear-gradient(
+    145deg,
+    rgba(239,68,68,.25),
+    rgba(127,29,29,.15)
+  );
+}
+
+
+/* =====================================================
+   PHONE BOTTOM
+===================================================== */
+
+.phone-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 57px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  background: rgba(0,0,0,.55);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.phone-bottom button {
+  background: transparent;
+  color: rgba(255,255,255,.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-bottom span {
+  font-size: 19px;
+}
+
+.phone-bottom small {
+  font-size: 8px;
+}
+
+
+/* =====================================================
+   APP PAGE
+===================================================== */
+
+.app-page-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.app-page-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.back-button {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 26px;
+}
+
+
+/* =====================================================
+   PHONE CONTENT
+===================================================== */
+
+.phone-card {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 17px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+
+.phone-card h3 {
+  margin: 0 0 7px;
+}
+
+.phone-card p {
+  color: rgba(255,255,255,.65);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.phone-action {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  background: #0f766e;
+  color: #fff;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+
+/* =====================================================
+   REGISTRATION
+===================================================== */
+
+.registration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(20,184,166,.15),
+      transparent 30%
+    ),
+    #05070a;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.registration-card {
+  width: min(510px, 100%);
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 28px;
+  background: rgba(14,18,24,.97);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 30px 100px rgba(0,0,0,.55);
+}
+
+.registration-brand {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: #2dd4bf;
+  margin-bottom: 25px;
+}
+
+.registration-step {
+  color: #2dd4bf;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.registration-card h1 {
+  font-size: clamp(28px,7vw,45px);
+  line-height: 1;
+  margin: 14px 0;
+}
+
+.registration-card h2 {
+  font-size: 23px;
+  line-height: 1.25;
+}
+
+.registration-card p {
+  color: rgba(255,255,255,.63);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.registration-card label:not(.gender-card) {
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(255,255,255,.82);
+}
+
+.registration-card input[type="text"],
+.registration-card input[type="number"] {
+  width: 100%;
+  padding: 14px 15px;
+  border-radius: 13px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: #080b10;
+  color: #fff;
+  outline: none;
+}
+
+.registration-card input:focus {
+  border-color: #14b8a6;
+}
+
+
+/* =====================================================
+   GENDER
+===================================================== */
+
+.gender-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .gender-card {
-  flex: 1;
   position: relative;
+  min-height: 90px;
+  padding: 15px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.13);
+  background: #080b10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-  border: 2px solid #ddd;
-  border-radius: 14px;
-  padding: 16px 10px;
-  text-align: center;
-  background: #fff;
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
 .gender-card input {
@@ -1035,44 +659,172 @@ body {
 }
 
 .gender-card span {
-  display: block;
   font-size: 28px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .gender-card strong {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .gender-card:has(input:checked) {
-  border-color: #0f766e;
-  background: #e6fffb;
-  transform: translateY(-2px);
+  background: rgba(20,184,166,.13);
+  border-color: #14b8a6;
+  box-shadow: 0 0 20px rgba(20,184,166,.12);
 }
-/* LIFE REGISTRATION CONTINUE BUTTON */
 
-#continueBtn {
-  display: block;
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.primary-button {
   width: 100%;
-  margin-top: 24px;
-  padding: 15px 20px;
-  border: none;
-  border-radius: 14px;
+  min-height: 54px;
+  margin-top: 25px;
+  padding: 14px 20px;
+  border-radius: 15px;
   background: #0f766e;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  position: relative;
-  z-index: 20;
-  min-height: 52px;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .8px;
+  box-shadow: 0 12px 30px rgba(15,118,110,.25);
 }
 
-#continueBtn:hover {
-  opacity: 0.92;
+.primary-button:active {
+  transform: scale(.98);
 }
 
-#continueBtn:active {
-  transform: scale(0.98);
+
+/* =====================================================
+   QUESTIONS
+===================================================== */
+
+#questionAnswers {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
 }
+
+.question-answer {
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  border-radius: 15px;
+  background: #080b10;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.1);
+  line-height: 1.4;
+}
+
+.question-answer:hover {
+  border-color: #14b8a6;
+  background: rgba(20,184,166,.08);
+}
+
+
+/* =====================================================
+   REVEAL
+===================================================== */
+
+.reveal-label {
+  color: #2dd4bf;
+  letter-spacing: 2px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#revealFamily {
+  color: #f8fafc;
+  font-size: clamp(30px,8vw,52px);
+  margin: 10px 0;
+}
+
+#revealPosition {
+  color: #2dd4bf;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.reveal-line {
+  height: 1px;
+  background: rgba(255,255,255,.1);
+  margin: 20px 0;
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translate(-50%,20px);
+  z-index: 1000;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #09090b;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%,0);
+}
+
+
+/* =====================================================
+   DESKTOP
+===================================================== */
+
+@media (min-width: 900px) {
+
+  .mobile-controls {
+    opacity: .72;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL PHONES
+===================================================== */
+
+@media (max-width: 480px) {
+
+  .registration-card {
+    padding: 22px;
+    border-radius: 22px;
+  }
+
+  .registration-card h1 {
+    font-size: 31px;
+  }
+
+  .phone {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    height: calc(100dvh - 16px);
+  }
+
+  .hud-card {
+    padding: 7px;
+  }
+
+  .hud-card strong {
+    font-size: 10px;
+  }
+
+  .needs-panel {
+    bottom: 112px;
+    width: 125px;
+  }
+
+  }
