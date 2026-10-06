@@ -2,218 +2,301 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0,
-        maximum-scale=1.0, user-scalable=no">
 
-  <meta name="theme-color" content="#0b0d0f">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0,
+    maximum-scale=1.0, user-scalable=no,
+    viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#07090d">
 
   <title>Life City</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <!-- Babylon.js 3D ENGINE -->
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
 </head>
 
 <body>
 
-  <!-- =========================
-       GAME
-  ========================== -->
+<!-- =====================================================
+     3D GAME
+===================================================== -->
 
-  <main id="game">
+<main id="game">
 
-    <!-- ACTUAL DEVICE TIME -->
-    <div class="device-status">
-      <span id="deviceTime">12:00</span>
+  <canvas id="gameCanvas"></canvas>
 
-      <div class="device-icons">
-        <span>▮▮▮</span>
-        <span>WiFi</span>
-        <span>●</span>
+  <!-- WORLD HUD -->
+
+  <div id="worldHUD">
+
+    <div class="hud-top">
+
+      <div class="hud-card location-card">
+        <span class="hud-label">LOCATION</span>
+        <strong id="locationLabel">YOUR STREET</strong>
       </div>
+
+      <div class="hud-card day-card">
+        <span class="hud-label">DAY</span>
+        <strong id="dayLabel">1</strong>
+      </div>
+
+      <div class="hud-card money-card">
+        <span class="hud-label">CASH</span>
+        <strong>₦<span id="money">0</span></strong>
+      </div>
+
     </div>
 
 
-    <!-- WORLD -->
-    <section class="world">
+    <!-- NEEDS -->
 
-      <canvas id="gameCanvas"></canvas>
+    <div class="needs-panel">
 
-      <!-- SMALL GAME INFORMATION -->
-      <div class="world-info">
-
-        <div>
-          <strong id="dayLabel">DAY 1</strong>
-          <small id="locationLabel">Your Street</small>
+      <div class="need-row">
+        <span>🍔</span>
+        <div class="need-track">
+          <div id="hungerBar" class="need-fill hunger"></div>
         </div>
+      </div>
 
-        <div class="money-display">
-          ₦<span id="money">0</span>
+      <div class="need-row">
+        <span>⚡</span>
+        <div class="need-track">
+          <div id="energyBar" class="need-fill energy"></div>
         </div>
+      </div>
+
+      <div class="need-row">
+        <span>🚿</span>
+        <div class="need-track">
+          <div id="hygieneBar" class="need-fill hygiene"></div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- WANTED -->
+
+    <div id="wantedPanel" class="wanted-panel hidden">
+
+      <span>WANTED</span>
+
+      <div id="wantedStars">
+        ★☆☆☆☆
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- WORLD MESSAGE -->
+
+  <div id="worldMessage" class="world-message">
+    Welcome to Life City.
+  </div>
+
+
+  <!-- PHONE OPEN -->
+
+  <button
+    id="phoneOpen"
+    class="floating-phone"
+    aria-label="Open phone"
+  >
+    📱
+  </button>
+
+
+  <!-- =====================================================
+       MOBILE MOVEMENT
+  ====================================================== -->
+
+  <div id="mobileControls" class="mobile-controls">
+
+    <div class="movement-pad">
+
+      <button data-move="up">▲</button>
+
+      <div class="movement-middle">
+
+        <button data-move="left">◀</button>
+
+        <button data-move="down">▼</button>
+
+        <button data-move="right">▶</button>
 
       </div>
 
+    </div>
 
-      <!-- NEEDS -->
-      <div class="needs">
+    <div class="action-pad">
 
-        <div class="need">
-          <span>🍔</span>
-          <div class="need-bar">
-            <div id="hungerBar" class="need-fill hunger"></div>
-          </div>
-        </div>
-
-        <div class="need">
-          <span>⚡</span>
-          <div class="need-bar">
-            <div id="energyBar" class="need-fill energy"></div>
-          </div>
-        </div>
-
-        <div class="need">
-          <span>🚿</span>
-          <div class="need-bar">
-            <div id="hygieneBar" class="need-fill hygiene"></div>
-          </div>
-        </div>
-
-      </div>
-
-
-      <!-- MOVEMENT CONTROLS -->
-      <div class="movement">
-
-        <button data-direction="up">▲</button>
-
-        <div>
-          <button data-direction="left">◀</button>
-          <button data-direction="down">▼</button>
-          <button data-direction="right">▶</button>
-        </div>
-
-      </div>
-
-
-      <!-- PHONE OPEN BUTTON -->
-      <button id="phoneOpen"
-              class="phone-open">
-        📱
+      <button id="interactButton">
+        E
       </button>
 
+      <button id="runButton">
+        RUN
+      </button>
 
-      <!-- =========================
-           PHONE
-      ========================== -->
+      <button id="actionButton">
+        ACTION
+      </button>
 
-      <aside id="phone" class="phone hidden">
+    </div>
 
-        <div class="phone-notch"></div>
+  </div>
+
+
+  <!-- =====================================================
+       PHONE
+  ====================================================== -->
+
+  <aside id="phone" class="phone hidden">
+
+    <div class="phone-shell">
+
+      <div class="phone-speaker"></div>
+
+      <div class="phone-screen">
 
         <div class="phone-status">
-          <span id="phoneTime">12:00</span>
 
-          <div>
+          <span id="phoneTime">
+            12:00
+          </span>
+
+          <span>
             ▮▮▮ &nbsp; WiFi &nbsp; ●
-          </div>
+          </span>
+
         </div>
 
 
         <!-- PHONE HOME -->
-        <section id="phoneHome" class="phone-page">
 
-          <div class="phone-wallpaper">
+        <section
+          id="phoneHome"
+          class="phone-page"
+        >
 
-            <div class="phone-profile-mini">
+          <div class="phone-header">
 
-              <div id="miniAvatar"
-                   class="mini-avatar">
+            <div class="mini-profile">
+
+              <div
+                id="miniAvatar"
+                class="mini-avatar"
+              >
                 ?
               </div>
 
               <div>
-                <strong id="miniName">Unknown</strong>
+
+                <strong id="miniName">
+                  Unknown
+                </strong>
+
                 <small id="miniIdentity">
                   New in the city
                 </small>
+
               </div>
 
             </div>
 
-
-            <div class="app-grid">
-
-              <button class="app"
-                      data-app="profile">
-
-                <span>👤</span>
-                <small>Profile</small>
-
-              </button>
+          </div>
 
 
-              <button class="app"
-                      data-app="bank">
+          <div class="app-grid">
 
-                <span>💳</span>
-                <small>Bank</small>
+            <button
+              class="app-icon"
+              data-app="profile"
+            >
+              <span>👤</span>
+              <small>Profile</small>
+            </button>
 
-              </button>
+            <button
+              class="app-icon"
+              data-app="bank"
+            >
+              <span>💳</span>
+              <small>Bank</small>
+            </button>
 
+            <button
+              class="app-icon"
+              data-app="house"
+            >
+              <span>🏠</span>
+              <small>House</small>
+            </button>
 
-              <button class="app"
-                      data-app="house">
+            <button
+              class="app-icon"
+              data-app="market"
+            >
+              <span>🛍️</span>
+              <small>Market</small>
+            </button>
 
-                <span>🏠</span>
-                <small>House</small>
+            <button
+              class="app-icon"
+              data-app="messages"
+            >
+              <span>💬</span>
+              <small>Messages</small>
+            </button>
 
-              </button>
+            <button
+              class="app-icon"
+              data-app="social"
+            >
+              <span>👥</span>
+              <small>Social</small>
+            </button>
 
+            <button
+              class="app-icon"
+              data-app="jobs"
+            >
+              <span>💼</span>
+              <small>Jobs</small>
+            </button>
 
-              <button class="app"
-                      data-app="market">
+            <button
+              class="app-icon"
+              data-app="news"
+            >
+              <span>📰</span>
+              <small>News</small>
+            </button>
 
-                <span>🛍️</span>
-                <small>Market</small>
+            <button
+              class="app-icon special-app"
+              data-app="dessert"
+            >
+              <span>🍰</span>
+              <small>Dessert Dash</small>
+            </button>
 
-              </button>
-
-
-              <button class="app"
-                      data-app="messages">
-
-                <span>💬</span>
-                <small>Messages</small>
-
-              </button>
-
-
-              <button class="app"
-                      data-app="social">
-
-                <span>👥</span>
-                <small>Social</small>
-
-              </button>
-
-
-              <button class="app"
-                      data-app="jobs">
-
-                <span>💼</span>
-                <small>Jobs</small>
-
-              </button>
-
-
-              <button class="app"
-                      data-app="news">
-
-                <span>📰</span>
-                <small>News</small>
-
-              </button>
-
-            </div>
+            <button
+              class="app-icon combat-app"
+              data-app="training"
+            >
+              <span>🎯</span>
+              <small>Training</small>
+            </button>
 
           </div>
 
@@ -221,78 +304,99 @@
 
 
         <!-- APP PAGE -->
-        <section id="appPage"
-                 class="phone-page app-page hidden">
 
-          <button id="appBack"
-                  class="app-back">
-            ‹
-          </button>
+        <section
+          id="appPage"
+          class="phone-page hidden"
+        >
 
-          <h2 id="appTitle">App</h2>
+          <div class="app-page-header">
+
+            <button
+              id="appBack"
+              class="back-button"
+            >
+              ‹
+            </button>
+
+            <h2 id="appTitle">
+              App
+            </h2>
+
+          </div>
 
           <div id="appContent"></div>
 
         </section>
 
 
-        <!-- PHONE BOTTOM BAR -->
+        <!-- PHONE NAV -->
+
         <nav class="phone-bottom">
 
           <button id="phoneHomeButton">
-            ⌂
+            <span>⌂</span>
             <small>Home</small>
           </button>
 
           <button id="phoneAppsButton">
-            ▦
+            <span>▦</span>
             <small>Apps</small>
           </button>
 
           <button id="phoneCloseButton">
-            −
+            <span>−</span>
             <small>Hide</small>
           </button>
 
         </nav>
 
-      </aside>
+      </div>
 
-    </section>
+    </div>
 
-  </main>
+  </aside>
 
 
-  <!-- =========================
+  <!-- =====================================================
        LIFE REGISTRATION
-  ========================== -->
+  ====================================================== -->
 
-  <section id="registration"
-           class="registration">
+  <section
+    id="registration"
+    class="registration-overlay"
+  >
 
     <div class="registration-card">
 
-      <div class="registration-step"
-           id="registrationStep">
-        LIFE REGISTRATION
+      <div class="registration-brand">
+        LIFE CITY
       </div>
 
-      <h1 id="registrationTitle">
-        Before the city knows you...
-      </h1>
 
-      <p id="registrationText">
-        Tell us a little about yourself.
-        The rest will be decided by the world you enter.
-      </p>
+      <!-- BASIC -->
+
+      <div
+        id="basicInformation"
+        class="registration-screen"
+      >
+
+        <span class="registration-step">
+          LIFE REGISTRATION
+        </span>
+
+        <h1>
+          Before the city knows you...
+        </h1>
+
+        <p>
+          Tell us a little about yourself.
+          The rest will be decided by the world
+          you enter.
+        </p>
 
 
-      <!-- BASIC INFORMATION -->
-
-      <div id="basicInformation"
-           class="registration-content">
-
-        <label>
+        <label for="nicknameInput">
           What should people call you?
         </label>
 
@@ -305,7 +409,7 @@
         >
 
 
-        <label>
+        <label for="ageInput">
           How old are you?
         </label>
 
@@ -321,52 +425,82 @@
         <label>
           How should the city know you?
         </label>
-<div class="question">
-  <label>Gender</label>
 
-  <div class="gender-options">
-    <label class="gender-card">
-      <input type="radio" name="gender" value="female">
-      <span>♀</span>
-      <strong>Female</strong>
-    </label>
+        <div class="gender-options">
 
-    <label class="gender-card">
-      <input type="radio" name="gender" value="male">
-      <span>♂</span>
-      <strong>Male</strong>
-    </label>
-  </div>
-</div>
+          <label class="gender-card">
 
-<button type="button" id="continueBtn" class="primary-button">
-  Continue
-</button>
-        
+            <input
+              type="radio"
+              name="gender"
+              value="female"
+            >
+
+            <span>♀</span>
+
+            <strong>
+              Female
+            </strong>
+
+          </label>
+
+
+          <label class="gender-card">
+
+            <input
+              type="radio"
+              name="gender"
+              value="male"
+            >
+
+            <span>♂</span>
+
+            <strong>
+              Male
+            </strong>
+
+          </label>
+
+        </div>
+
+
+        <button
+          type="button"
+          id="continueBtn"
+          class="primary-button"
+        >
+          CONTINUE
+        </button>
+
       </div>
+
 
       <!-- QUESTIONS -->
 
-      <div id="questions"
-           class="registration-content hidden">
+      <div
+        id="questions"
+        class="registration-screen hidden"
+      >
 
-        <div id="questionNumber"
-             class="question-number">
-        </div>
+        <span
+          id="questionNumber"
+          class="registration-step"
+        >
+        </span>
 
         <h2 id="questionText"></h2>
 
-        <div id="questionAnswers"
-             class="question-answers">
-        </div>
+        <div id="questionAnswers"></div>
 
       </div>
 
 
-      <!-- LIFE REVEAL -->
+      <!-- REVEAL -->
 
-      <div id="lifeReveal"
-           class="registration-content hidden">
+      <div
+        id="lifeReveal"
+        class="registration-screen hidden"
+      >
 
         <div class="reveal-label">
           YOUR LIFE HAS BEEN DECIDED.
@@ -376,27 +510,33 @@
           You were born into...
         </h2>
 
-        <h1 id="revealFamily"></h1>
+        <h1 id="revealFamily">
+        </h1>
 
-        <p id="revealDescription"></p>
+        <p id="revealDescription">
+        </p>
 
-        <div class="reveal-divider"></div>
+        <div class="reveal-line"></div>
 
         <p>
           Your father is...
         </p>
 
-        <h3 id="revealFather"></h3>
+        <h3 id="revealFather">
+        </h3>
 
         <p>
           Your position in the family:
         </p>
 
-        <h3 id="revealPosition"></h3>
+        <h3 id="revealPosition">
+        </h3>
 
-        <button id="enterCity"
-                class="primary-button">
-          Enter the City
+        <button
+          id="enterCity"
+          class="primary-button"
+        >
+          ENTER THE CITY
         </button>
 
       </div>
@@ -408,12 +548,20 @@
 
   <!-- TOAST -->
 
-  <div id="toast"
-       class="toast">
+  <div
+    id="toast"
+    class="toast"
+  >
   </div>
 
 
+  <!-- =====================================================
+       SCRIPT
+  ====================================================== -->
+
   <script src="script.js"></script>
 
+</main>
+
 </body>
-        </html>
+            </html>
