@@ -100,7 +100,97 @@ const Game = {
 
 };
 
+/* =====================================================
+   GENDER + CONTINUE
+===================================================== */
 
+const genderOptions = document.querySelectorAll(
+  'input[name="gender"]'
+);
+
+genderOptions.forEach(input => {
+  input.addEventListener("change", function () {
+    selectedGender = this.value;
+
+    document
+      .querySelectorAll(".gender-card")
+      .forEach(card => {
+        card.classList.remove("selected");
+      });
+
+    this.closest(".gender-card")
+      .classList.add("selected");
+  });
+});
+
+
+const continueBtn =
+  document.getElementById("continueBtn");
+
+
+continueBtn.addEventListener("click", function () {
+
+  const nickname =
+    document
+      .getElementById("nicknameInput")
+      .value
+      .trim();
+
+  const age =
+    Number(
+      document
+        .getElementById("ageInput")
+        .value
+    );
+
+  const chosenGender =
+    document.querySelector(
+      'input[name="gender"]:checked'
+    );
+
+
+  if (!nickname) {
+    showToast(
+      "Enter the name people will call you."
+    );
+    return;
+  }
+
+
+  if (!age || age < 16 || age > 80) {
+    showToast(
+      "Enter an age between 16 and 80."
+    );
+    return;
+  }
+
+
+  if (!chosenGender) {
+    showToast(
+      "Please select your gender."
+    );
+    return;
+  }
+
+
+  /* SAVE BASIC INFORMATION */
+
+  player.nickname = nickname;
+  player.age = age;
+  player.gender = chosenGender.value;
+
+
+  /* MOVE TO QUESTIONS */
+
+  basicInformation.classList.add("hidden");
+
+  questionsScreen.classList.remove("hidden");
+
+  questionIndex = 0;
+
+  showQuestion();
+
+});
 /* =====================================================
    PLAYER
 ===================================================== */
