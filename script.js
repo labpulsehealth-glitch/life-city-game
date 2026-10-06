@@ -1,59 +1,108 @@
 /* =====================================================
    LIFE CITY
-   PHASE 2
-   LIFE REGISTRATION + UNIQUE ORIGIN SYSTEM
+   COMPLETE 3D BROWSER GAME FOUNDATION
+
+   Engine:
+   Babylon.js
+
+   Systems:
+   - 3D world
+   - character
+   - movement
+   - registration
+   - hidden traits
+   - family generation
+   - house
+   - furniture
+   - phone
+   - market
+   - food
+   - jobs
+   - social
+   - news
+   - Dessert Dash
+   - fictional combat/training
+   - wanted system
+   - saving
 ===================================================== */
 
 
 /* =====================================================
-   CANVAS
+   GLOBAL GAME STATE
 ===================================================== */
 
-const canvas =
-  document.getElementById("gameCanvas");
+const Game = {
 
-const ctx =
-  canvas.getContext("2d");
+  engine: null,
 
-let width = 0;
-let height = 0;
+  scene: null,
 
+  camera: null,
 
-function resizeCanvas() {
+  playerMesh: null,
 
-  const dpr =
-    Math.min(window.devicePixelRatio || 1, 2);
+  playerParts: {},
 
-  width = window.innerWidth;
-  height = window.innerHeight;
+  npcs: [],
 
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
+  enemies: [],
 
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
+  bullets: [],
 
-  ctx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
-  );
-}
+  buildings: [],
 
+  furniture: [],
 
-resizeCanvas();
+  mode: "city",
 
-window.addEventListener(
-  "resize",
-  resizeCanvas
-);
+  houseMode: false,
+
+  phoneOpen: false,
+
+  gameStarted: false,
+
+  currentLocation: "Your Street",
+
+  lastTime: performance.now(),
+
+  keys: {},
+
+  movement: {
+    x: 0,
+    z: 0,
+    running: false
+  },
+
+  combat: {
+    health: 100,
+    ammo: 12,
+    wanted: 0,
+    cooldown: 0
+  },
+
+  foodGame: {
+
+    active: false,
+
+    score: 0,
+
+    lives: 3,
+
+    time: 30,
+
+    objects: [],
+
+    timer: null
+
+  },
+
+  worldDay: 1
+
+};
 
 
 /* =====================================================
-   DEFAULT PLAYER
+   PLAYER
 ===================================================== */
 
 const defaultPlayer = {
@@ -90,72 +139,65 @@ const defaultPlayer = {
 
   hygiene: 100,
 
-  x: 500,
+  health: 100,
 
-  y: 400,
+  houseType: "Apartment",
 
-  day: 1,
-
-  hiddenTraits: {
+  traits: {
 
     ambition: 0,
+
     courage: 0,
+
     kindness: 0,
+
     intelligence: 0,
+
     loyalty: 0,
-    risk: 0
+
+    risk: 0,
+
     patience: 0
-}
+
+  }
 
 };
 
 
-/* =====================================================
-   SAVE / LOAD
-===================================================== */
-
 let player =
   JSON.parse(
-    localStorage.getItem("lifeCityPlayer")
+    localStorage.getItem(
+      "lifeCityPlayer"
+    )
   ) ||
   structuredClone(defaultPlayer);
 
 
-let registeredWorld =
+let population =
   JSON.parse(
-    localStorage.getItem("lifeCityPopulation")
-  ) || {};
+    localStorage.getItem(
+      "lifeCityPopulation"
+    )
+  ) ||
+  {};
 
 
-/*
-  IMPORTANT:
+/* =====================================================
+   SAVE
+===================================================== */
 
-  This is the prototype population registry.
-
-  Later, when we add multiplayer,
-  this exact structure will move to
-  the server/database.
-
-  The browser should NEVER be trusted
-  as the final authority for uniqueness.
-*/
-
-
-function savePlayer() {
+function saveGame() {
 
   localStorage.setItem(
     "lifeCityPlayer",
     JSON.stringify(player)
   );
-}
-
-
-function savePopulation() {
 
   localStorage.setItem(
     "lifeCityPopulation",
-    JSON.stringify(registeredWorld)
+    JSON.stringify(population)
   );
+
 }
 
 
@@ -166,6 +208,7 @@ function savePopulation() {
 const families = [
 
   {
+
     id: "russo",
 
     surname: "Russo",
@@ -177,51 +220,19 @@ const families = [
     description:
       "A powerful Mafia dynasty known for territory, loyalty and enforcement. Their influence reaches deep into the city's criminal underworld.",
 
-    father:
-      "Don Russo",
+    father: "Don Russo",
 
-    mother:
-      "Elena Russo",
+    mother: "Elena Russo",
 
-    positions: {
+    money: 75000,
 
-      female: [
-        {
-          key: "eldest-daughter",
-          title: "Eldest Daughter"
-        },
-        {
-          key: "second-daughter",
-          title: "Second Daughter"
-        },
-        {
-          key: "youngest-daughter",
-          title: "Youngest Daughter"
-        }
-      ],
+    color: "#991b1b"
 
-      male: [
-        {
-          key: "eldest-son",
-          title: "Eldest Son"
-        },
-        {
-          key: "second-son",
-          title: "Second Son"
-        },
-        {
-          key: "youngest-son",
-          title: "Youngest Son"
-        }
-      ]
-
-    },
-
-    startingMoney: 75000
   },
 
 
   {
+
     id: "varelli",
 
     surname: "Varelli",
@@ -231,53 +242,21 @@ const families = [
     type: "Mafia Family",
 
     description:
-      "An old and influential Mafia dynasty built around information, connections and secrets. Very few things happen in the city without the Varelli family hearing about them.",
+      "An old dynasty built around information, connections and secrets. Very few things happen in the city without the Varelli family hearing about them.",
 
-    father:
-      "Don Varelli",
+    father: "Don Varelli",
 
-    mother:
-      "Lucia Varelli",
+    mother: "Lucia Varelli",
 
-    positions: {
+    money: 85000,
 
-      female: [
-        {
-          key: "eldest-daughter",
-          title: "Eldest Daughter"
-        },
-        {
-          key: "second-daughter",
-          title: "Second Daughter"
-        },
-        {
-          key: "youngest-daughter",
-          title: "Youngest Daughter"
-        }
-      ],
+    color: "#4338ca"
 
-      male: [
-        {
-          key: "eldest-son",
-          title: "Eldest Son"
-        },
-        {
-          key: "second-son",
-          title: "Second Son"
-        },
-        {
-          key: "youngest-son",
-          title: "Youngest Son"
-        }
-      ]
-
-    },
-
-    startingMoney: 85000
   },
 
 
   {
+
     id: "moretti",
 
     surname: "Moretti",
@@ -287,53 +266,21 @@ const families = [
     type: "Mafia Family",
 
     description:
-      "A wealthy dynasty with legitimate businesses, powerful connections and a hidden criminal network operating behind respectable doors.",
+      "A wealthy dynasty with legitimate businesses and a hidden criminal network operating behind respectable doors.",
 
-    father:
-      "Don Moretti",
+    father: "Don Moretti",
 
-    mother:
-      "Sofia Moretti",
+    mother: "Sofia Moretti",
 
-    positions: {
+    money: 100000,
 
-      female: [
-        {
-          key: "eldest-daughter",
-          title: "Eldest Daughter"
-        },
-        {
-          key: "second-daughter",
-          title: "Second Daughter"
-        },
-        {
-          key: "youngest-daughter",
-          title: "Youngest Daughter"
-        }
-      ],
+    color: "#92400e"
 
-      male: [
-        {
-          key: "eldest-son",
-          title: "Eldest Son"
-        },
-        {
-          key: "second-son",
-          title: "Second Son"
-        },
-        {
-          key: "youngest-son",
-          title: "Youngest Son"
-        }
-      ]
-
-    },
-
-    startingMoney: 100000
   },
 
 
   {
+
     id: "bellini",
 
     surname: "Bellini",
@@ -345,47 +292,14 @@ const families = [
     description:
       "A sophisticated dynasty whose power is built through influence, politics, business and relationships with the city's most important people.",
 
-    father:
-      "Don Bellini",
+    father: "Don Bellini",
 
-    mother:
-      "Isabella Bellini",
+    mother: "Isabella Bellini",
 
-    positions: {
+    money: 90000,
 
-      female: [
-        {
-          key: "eldest-daughter",
-          title: "Eldest Daughter"
-        },
-        {
-          key: "second-daughter",
-          title: "Second Daughter"
-        },
-        {
-          key: "youngest-daughter",
-          title: "Youngest Daughter"
-        }
-      ],
+    color: "#7e22ce"
 
-      male: [
-        {
-          key: "eldest-son",
-          title: "Eldest Son"
-        },
-        {
-          key: "second-son",
-          title: "Second Son"
-        },
-        {
-          key: "youngest-son",
-          title: "Youngest Son"
-        }
-      ]
-
-    },
-
-    startingMoney: 90000
   }
 
 ];
@@ -398,6 +312,7 @@ const families = [
 const questions = [
 
   {
+
     text:
       "Someone you love is in trouble. Helping them could put you in trouble too. What do you do?",
 
@@ -443,10 +358,12 @@ const questions = [
       }
 
     ]
+
   },
 
 
   {
+
     text:
       "You discover that someone has been secretly talking about you.",
 
@@ -491,10 +408,12 @@ const questions = [
       }
 
     ]
+
   },
 
 
   {
+
     text:
       "You suddenly receive an opportunity that could completely change your life.",
 
@@ -539,10 +458,12 @@ const questions = [
       }
 
     ]
+
   },
 
 
   {
+
     text:
       "Someone weaker than you is being treated unfairly.",
 
@@ -588,10 +509,12 @@ const questions = [
       }
 
     ]
+
   },
 
 
   {
+
     text:
       "You could become extremely successful, but your success might create enemies.",
 
@@ -636,801 +559,982 @@ const questions = [
       }
 
     ]
+
   }
 
 ];
 
 
 /* =====================================================
-   REGISTRATION STATE
+   DOM
 ===================================================== */
 
-let selectedGender = "";
-let questionIndex = 0;
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
+const canvas =
+  document.getElementById(
+    "gameCanvas"
+  );
 
 const registration =
-  document.getElementById("registration");
+  document.getElementById(
+    "registration"
+  );
 
 const basicInformation =
-  document.getElementById("basicInformation");
+  document.getElementById(
+    "basicInformation"
+  );
 
 const questionsScreen =
-  document.getElementById("questions");
+  document.getElementById(
+    "questions"
+  );
 
 const lifeReveal =
-  document.getElementById("lifeReveal");
-
-const continueBtn =
-  document.getElementById("continueBtn");
-
-/* =====================================================
-   GENDER
-===================================================== */
-
-document
-  .querySelectorAll('input[name="gender"]')
-  .forEach(input => {
-
-    input.addEventListener("change", () => {
-
-      selectedGender =
-        input.value;
-
-    });
-
-  });
-
-
-/* =====================================================
-   CONTINUE BUTTON
-===================================================== */
-
-const continueBtn =
-  document.getElementById("continueBtn");
-
-if (continueBtn) {
-
-  continueBtn.addEventListener(
-    "click",
-    startQuestions
+  document.getElementById(
+    "lifeReveal"
   );
 
-}
-
-
-
-
-/* =====================================================
-   BASIC REGISTRATION
-===================================================== */
-
-if (continueBtn) {
-
-  continueBtn.addEventListener(
-    "click",
-    startQuestions
+const continueBtn =
+  document.getElementById(
+    "continueBtn"
   );
 
-}
-
-
-function startQuestions() {
-
-  const nickname =
-    document
-      .getElementById("nicknameInput")
-      .value
-      .trim();
-
-  const age =
-    Number(
-      document
-        .getElementById("ageInput")
-        .value
-    );
-
-
-  /* -----------------------------
-     CHECK NICKNAME
-  ----------------------------- */
-
-  if (!nickname) {
-
-    showToast(
-      "Enter the name people will call you."
-    );
-
-    return;
-
-  }
-
-
-  /* -----------------------------
-     CHECK AGE
-  ----------------------------- */
-
-  if (
-    !age ||
-    age < 16 ||
-    age > 80
-  ) {
-
-    showToast(
-      "Enter an age between 16 and 80."
-    );
-
-    return;
-
-  }
-
-
-  /* -----------------------------
-     CHECK GENDER
-  ----------------------------- */
-
-  const selected =
-    document.querySelector(
-      'input[name="gender"]:checked'
-    );
-
-
-  if (!selected) {
-
-    showToast(
-      "Choose how the city knows you."
-    );
-
-    return;
-
-  }
-
-
-  selectedGender =
-    selected.value;
-
-
-  /* -----------------------------
-     SAVE BASIC INFORMATION
-  ----------------------------- */
-
-  player.nickname =
-    nickname;
-
-  player.age =
-    age;
-
-  player.gender =
-    selectedGender;
-
-
-  questionIndex =
-    0;
-
-
-  /* -----------------------------
-     MOVE TO QUESTIONS
-  ----------------------------- */
-
-  basicInformation
-    .classList.add("hidden");
-
-  questionsScreen
-    .classList.remove("hidden");
-
-
-  showQuestion();
-
-}
+const enterCity =
+  document.getElementById(
+    "enterCity"
+  );
 
 
 /* =====================================================
-   GENDER CARD CLICK SUPPORT
+   BABYLON INITIALIZATION
 ===================================================== */
 
-document
-  .querySelectorAll(".gender-card")
-  .forEach(card => {
+function initializeEngine() {
 
-    card.addEventListener(
-      "click",
-      () => {
-
-        const radio =
-          card.querySelector(
-            'input[type="radio"]'
-          );
-
-        if (radio) {
-
-          radio.checked = true;
-
-          selectedGender =
-            radio.value;
-
-        }
-
-      }
+  Game.engine =
+    new BABYLON.Engine(
+      canvas,
+      true,
+      {
+        preserveDrawingBuffer: true,
+        stencil: true
+      },
+      true
     );
 
-  });
 
-/* =====================================================
-   QUESTIONS
-===================================================== */
-
-function showQuestion() {
-
-  const question =
-    questions[questionIndex];
+  Game.scene =
+    new BABYLON.Scene(
+      Game.engine
+    );
 
 
-  document
-    .getElementById("questionNumber")
-    .textContent =
-      `QUESTION ${questionIndex + 1} OF ${questions.length}`;
+  Game.scene.clearColor =
+    new BABYLON.Color4(
+      0.035,
+      0.05,
+      0.07,
+      1
+    );
 
 
-  document
-    .getElementById("questionText")
-    .textContent =
-      question.text;
+  createCamera();
+
+  createLighting();
+
+  createCity();
+
+  createPlayer();
+
+  createNPCs();
+
+  setupInput();
+
+  setupMobileControls();
+
+  Game.engine.runRenderLoop(
+    gameLoop
+  );
 
 
-  const answers =
-    document
-      .getElementById("questionAnswers");
-
-
-  answers.innerHTML = "";
-
-
-  question.answers.forEach(
-    answer => {
-
-      const button =
-        document.createElement("button");
-
-      button.className =
-        "question-answer";
-
-      button.textContent =
-        answer.text;
-
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          applyTraits(
-            answer.traits
-          );
-
-          questionIndex++;
-
-
-          if (
-            questionIndex >=
-            questions.length
-          ) {
-
-            determineLife();
-
-          } else {
-
-            showQuestion();
-
-          }
-
-        }
-      );
-
-
-      answers.appendChild(button);
-
+  window.addEventListener(
+    "resize",
+    () => {
+      Game.engine.resize();
     }
   );
 
 }
 
 
-function applyTraits(traits) {
+/* =====================================================
+   CAMERA
+===================================================== */
 
-  Object.entries(traits)
-    .forEach(
-      ([trait, value]) => {
+function createCamera() {
 
-        if (
-          player.hiddenTraits[trait] !==
-          undefined
-        ) {
-
-          player.hiddenTraits[trait] +=
-            value;
-
-        }
-
-      }
+  Game.camera =
+    new BABYLON.FollowCamera(
+      "followCamera",
+      new BABYLON.Vector3(
+        0,
+        8,
+        -12
+      ),
+      Game.scene
     );
+
+
+  Game.camera.radius = 11;
+
+  Game.camera.heightOffset = 7;
+
+  Game.camera.rotationOffset = 180;
+
+  Game.camera.cameraAcceleration = .05;
+
+  Game.camera.maxCameraSpeed = 15;
+
+  Game.camera.fov = .8;
 
 }
 
 
 /* =====================================================
-   UNIQUE POSITION SYSTEM
+   LIGHT
 ===================================================== */
 
-function getPopulationKey(
-  familyId,
-  positionKey
-) {
+function createLighting() {
 
-  return `${familyId}:${positionKey}`;
+  const light =
+    new BABYLON.HemisphericLight(
+      "cityLight",
+      new BABYLON.Vector3(
+        0,
+        1,
+        0
+      ),
+      Game.scene
+    );
+
+  light.intensity = 1.15;
+
+
+  const sun =
+    new BABYLON.DirectionalLight(
+      "sun",
+      new BABYLON.Vector3(
+        -0.5,
+        -1,
+        -0.5
+      ),
+      Game.scene
+    );
+
+  sun.intensity = .8;
 
 }
 
 
-/*
-  This quietly checks which positions
-  already exist in the current world.
+/* =====================================================
+   MATERIAL
+===================================================== */
 
-  The player NEVER sees this process.
-*/
-
-function positionIsOccupied(
-  familyId,
-  positionKey
+function material(
+  name,
+  color
 ) {
 
-  const key =
-    getPopulationKey(
-      familyId,
-      positionKey
+  const mat =
+    new BABYLON.StandardMaterial(
+      name,
+      Game.scene
     );
 
-  return Boolean(
-    registeredWorld[key]
+  mat.diffuseColor =
+    BABYLON.Color3.FromHexString(
+      color
+    );
+
+  return mat;
+
+}
+
+
+/* =====================================================
+   CITY
+===================================================== */
+
+function createCity() {
+
+  const ground =
+    BABYLON.MeshBuilder.CreateGround(
+      "cityGround",
+      {
+        width: 120,
+        height: 120
+      },
+      Game.scene
+    );
+
+  ground.material =
+    material(
+      "groundMat",
+      "#24352d"
+    );
+
+
+  /* ROAD */
+
+  createBox(
+    "mainRoad",
+    120,
+    .15,
+    10,
+    0,
+    .05,
+    0,
+    "#252a32"
+  );
+
+
+  createBox(
+    "crossRoad",
+    10,
+    .16,
+    120,
+    0,
+    .06,
+    0,
+    "#252a32"
+  );
+
+
+  /* CITY BLOCKS */
+
+  createBuilding(
+    "Market",
+    -25,
+    4,
+    -25,
+    14,
+    8,
+    14,
+    "#7c3aed"
+  );
+
+
+  createBuilding(
+    "Cafe",
+    25,
+    3,
+    -25,
+    12,
+    6,
+    12,
+    "#92400e"
+  );
+
+
+  createBuilding(
+    "Police Station",
+    -25,
+    4,
+    25,
+    15,
+    8,
+    12,
+    "#334155"
+  );
+
+
+  createBuilding(
+    "Hospital",
+    25,
+    5,
+    25,
+    15,
+    10,
+    13,
+    "#e5e7eb"
+  );
+
+
+  createBuilding(
+    "City Hall",
+    0,
+    5,
+    38,
+    20,
+    10,
+    12,
+    "#64748b"
+  );
+
+
+  /* HOUSES */
+
+  createHouse(
+    -42,
+    -40,
+    "Russo Estate",
+    "#7f1d1d",
+    "Mansion"
+  );
+
+
+  createHouse(
+    42,
+    -40,
+    "Varelli Estate",
+    "#312e81",
+    "Mansion"
+  );
+
+
+  createHouse(
+    -42,
+    40,
+    "Moretti Estate",
+    "#78350f",
+    "Luxury Estate"
+  );
+
+
+  createHouse(
+    42,
+    40,
+    "Bellini Estate",
+    "#581c87",
+    "Luxury Estate"
+  );
+
+
+  /* PARK */
+
+  createPark(
+    0,
+    -35
   );
 
 }
 
 
 /* =====================================================
-   FIND AVAILABLE LIFE
+   BOX
 ===================================================== */
 
-function findAvailableLife() {
+function createBox(
+  name,
+  width,
+  height,
+  depth,
+  x,
+  y,
+  z,
+  color
+) {
 
-  const possibleLives = [];
+  const mesh =
+    BABYLON.MeshBuilder.CreateBox(
+      name,
+      {
+        width,
+        height,
+        depth
+      },
+      Game.scene
+    );
+
+  mesh.position =
+    new BABYLON.Vector3(
+      x,
+      y,
+      z
+    );
+
+  mesh.material =
+    material(
+      name + "Material",
+      color
+    );
+
+  return mesh;
+
+}
 
 
-  families.forEach(
-    family => {
+/* =====================================================
+   BUILDING
+===================================================== */
 
-      const positions =
-        family.positions[player.gender];
+function createBuilding(
+  name,
+  x,
+  y,
+  z,
+  width,
+  height,
+  depth,
+  color
+) {
 
+  const building =
+    createBox(
+      name,
+      width,
+      height,
+      depth,
+      x,
+      y,
+      z,
+      color
+    );
 
-      positions.forEach(
-        position => {
-
-          if (
-            !positionIsOccupied(
-              family.id,
-              position.key
-            )
-          ) {
-
-            possibleLives.push({
-
-              family,
-
-              position
-
-            });
-
-          }
-
-        }
-      );
-
-    }
+  Game.buildings.push(
+    building
   );
 
 
-  if (!possibleLives.length) {
+  const sign =
+    BABYLON.MeshBuilder.CreatePlane(
+      name + "Sign",
+      {
+        width: 6,
+        height: 1.5
+      },
+      Game.scene
+    );
 
-    /*
-      This is extremely unlikely
-      in this prototype.
+  sign.position =
+    new BABYLON.Vector3(
+      x,
+      height + 1,
+      z - depth / 2 - .1
+    );
 
-      Later the server will have
-      a much larger population system.
-    */
+  const signMat =
+    new BABYLON.StandardMaterial(
+      name + "SignMaterial",
+      Game.scene
+    );
 
-    return null;
+  signMat.diffuseColor =
+    BABYLON.Color3.FromHexString(
+      "#111827"
+    );
 
-  }
-
-
-  /*
-    The player's hidden answers influence
-    which life is more likely, without
-    directly exposing the mechanism.
-  */
-
-  const traits =
-    player.hiddenTraits;
-
-
-  let weights =
-    possibleLives.map(
-      life => {
-
-        let weight = 1;
-
-
-        if (
-          traits.ambition >= 4
-        ) {
-
-          weight +=
-            life.family.startingMoney /
-            50000;
-
-        }
+  sign.material =
+    signMat;
 
 
-        if (
-          traits.risk >= 3
-        ) {
+  return building;
 
-          weight +=
-            life.family.type ===
-            "Mafia Family"
-              ? 2
-              : 0;
-
-        }
+}
 
 
-        if (
-          traits.loyalty >= 4
-        ) {
+/* =====================================================
+   HOUSE
+===================================================== */
 
-          weight += 1;
+function createHouse(
+  x,
+  z,
+  name,
+  color,
+  type
+) {
 
-        }
-
-
-        return weight;
-
-      }
+  const house =
+    createBuilding(
+      name,
+      x,
+      4,
+      z,
+      type === "Luxury Estate"
+        ? 18
+        : 15,
+      8,
+      type === "Luxury Estate"
+        ? 18
+        : 15,
+      color
     );
 
 
-  const total =
-    weights.reduce(
-      (sum, value) =>
-        sum + value,
-      0
+  house.metadata = {
+
+    house: true,
+
+    houseName: name,
+
+    houseType: type
+
+  };
+
+}
+
+
+/* =====================================================
+   PARK
+===================================================== */
+
+function createPark(
+  x,
+  z
+) {
+
+  const grass =
+    createBox(
+      "Park",
+      25,
+      .2,
+      20,
+      x,
+      .1,
+      z,
+      "#166534"
     );
-
-
-  let random =
-    Math.random() * total;
 
 
   for (
     let i = 0;
-    i < possibleLives.length;
+    i < 8;
     i++
   ) {
 
-    random -= weights[i];
+    const tree =
+      BABYLON.MeshBuilder.CreateCylinder(
+        "TreeTrunk",
+        {
+          diameter: .7,
+          height: 3
+        },
+        Game.scene
+      );
 
-    if (random <= 0) {
+    tree.position =
+      new BABYLON.Vector3(
+        x + Math.random() * 20 - 10,
+        1.5,
+        z + Math.random() * 16 - 8
+      );
 
-      return possibleLives[i];
+    tree.material =
+      material(
+        "trunk" + i,
+        "#78350f"
+      );
 
-    }
+
+    const leaves =
+      BABYLON.MeshBuilder.CreateSphere(
+        "TreeLeaves",
+        {
+          diameter: 3
+        },
+        Game.scene
+      );
+
+    leaves.position =
+      tree.position.clone();
+
+    leaves.position.y = 3.5;
+
+    leaves.material =
+      material(
+        "leaves" + i,
+        "#15803d"
+      );
 
   }
-
-
-  return possibleLives[0];
 
 }
 
 
 /* =====================================================
-   DETERMINE LIFE
+   3D PLAYER
 ===================================================== */
 
-function determineLife() {
+function createPlayer() {
 
-  questionsScreen
-    .classList.add("hidden");
-
-
-  const life =
-    findAvailableLife();
-
-
-  if (!life) {
-
-    showToast(
-      "The city population is full."
-    );
-
-    return;
-
-  }
-
-
-  const family =
-    life.family;
-
-  const position =
-    life.position;
-
-
-  player.surname =
-    family.surname;
-
-  player.family =
-    family.name;
-
-  player.familyType =
-    family.type;
-
-  player.familyDescription =
-    family.description;
-
-  player.position =
-    position.title;
-
-  player.father =
-    family.father;
-
-  player.mother =
-    family.mother;
-
-  player.identity =
-    `${player.nickname} ${player.surname}`;
-
-  player.money =
-    family.startingMoney;
-
-
-  /*
-    Reserve the position.
-
-    In multiplayer this reservation
-    will happen on the server/database.
-  */
-
-  const key =
-    getPopulationKey(
-      family.id,
-      position.key
+  const root =
+    new BABYLON.TransformNode(
+      "Player",
+      Game.scene
     );
 
 
-  registeredWorld[key] = {
+  const skin =
+    material(
+      "playerSkin",
+      player.gender === "male"
+        ? "#a86f52"
+        : "#9a6249"
+    );
 
-    playerId:
-      player.id ||
-      createPlayerId(),
 
-    nickname:
-      player.nickname,
+  const clothes =
+    material(
+      "playerClothes",
+      "#0f766e"
+    );
 
-    surname:
-      player.surname,
 
-    gender:
-      player.gender,
+  const head =
+    BABYLON.MeshBuilder.CreateSphere(
+      "PlayerHead",
+      {
+        diameter: 1.1
+      },
+      Game.scene
+    );
 
-    position:
-      player.position
+  head.parent = root;
+
+  head.position.y = 2.65;
+
+  head.material = skin;
+
+
+  const body =
+    createBox(
+      "PlayerBody",
+      1.05,
+      1.45,
+      .65,
+      0,
+      1.65,
+      0,
+      "#0f766e"
+    );
+
+  body.parent = root;
+
+  body.position =
+    new BABYLON.Vector3(
+      0,
+      1.65,
+      0
+    );
+
+
+  const leftLeg =
+    createBox(
+      "LeftLeg",
+      .35,
+      1.25,
+      .4,
+      0,
+      0,
+      0,
+      "#172033"
+    );
+
+  leftLeg.parent = root;
+
+  leftLeg.position =
+    new BABYLON.Vector3(
+      -.27,
+      .55,
+      0
+    );
+
+
+  const rightLeg =
+    createBox(
+      "RightLeg",
+      .35,
+      1.25,
+      .4,
+      0,
+      0,
+      0,
+      "#172033"
+    );
+
+  rightLeg.parent = root;
+
+  rightLeg.position =
+    new BABYLON.Vector3(
+      .27,
+      .55,
+      0
+    );
+
+
+  Game.playerMesh =
+    root;
+
+  Game.playerParts = {
+
+    head,
+
+    body,
+
+    leftLeg,
+
+    rightLeg
 
   };
 
 
-  player.id =
-    registeredWorld[key].playerId;
+  Game.camera.lockedTarget =
+    root;
 
 
-  savePopulation();
-
-  savePlayer();
-
-
-  showLifeReveal();
+  root.position =
+    new BABYLON.Vector3(
+      0,
+      0,
+      0
+    );
 
 }
 
 
 /* =====================================================
-   PLAYER ID
+   NPC
 ===================================================== */
 
-function createPlayerId() {
+function createNPC(
+  x,
+  z,
+  name
+) {
 
-  return (
-    "player-" +
-    Date.now() +
-    "-" +
-    Math.random()
-      .toString(36)
-      .slice(2, 9)
+  const root =
+    new BABYLON.TransformNode(
+      "NPC_" + name,
+      Game.scene
+    );
+
+
+  const skin =
+    material(
+      "npcSkin" + name,
+      "#a56a4e"
+    );
+
+
+  const head =
+    BABYLON.MeshBuilder.CreateSphere(
+      "npcHead" + name,
+      {
+        diameter: .9
+      },
+      Game.scene
+    );
+
+  head.parent = root;
+
+  head.position.y = 2.3;
+
+  head.material = skin;
+
+
+  const body =
+    createBox(
+      "npcBody" + name,
+      .9,
+      1.3,
+      .6,
+      0,
+      1.35,
+      0,
+      "#475569"
+    );
+
+  body.parent = root;
+
+
+  root.position =
+    new BABYLON.Vector3(
+      x,
+      0,
+      z
+    );
+
+
+  Game.npcs.push({
+
+    mesh: root,
+
+    name,
+
+    direction:
+      Math.random() * Math.PI * 2,
+
+    timer: 0
+
+  });
+
+}
+
+
+/* =====================================================
+   NPCS
+===================================================== */
+
+function createNPCs() {
+
+  const names = [
+
+    "Ayo",
+    "Maya",
+    "David",
+    "Lena",
+    "Marcus",
+    "Tobi",
+    "Nora",
+    "Daniel"
+
+  ];
+
+
+  names.forEach(
+    (name, index) => {
+
+      createNPC(
+        Math.random() * 50 - 25,
+        Math.random() * 50 - 25,
+        name + index
+      );
+
+    }
   );
 
 }
 
 
 /* =====================================================
-   LIFE REVEAL
+   INPUT
 ===================================================== */
 
-function showLifeReveal() {
+function setupInput() {
 
-  lifeReveal
-    .classList.remove("hidden");
+  window.addEventListener(
+    "keydown",
+    event => {
 
-
-  document
-    .getElementById("revealFamily")
-    .textContent =
-      player.family;
-
-
-  document
-    .getElementById("revealDescription")
-    .textContent =
-      player.familyDescription;
+      Game.keys[
+        event.key.toLowerCase()
+      ] = true;
 
 
-  document
-    .getElementById("revealFather")
-    .textContent =
-      player.father;
+      if (
+        event.key.toLowerCase() === "e"
+      ) {
+
+        interact();
+
+      }
 
 
-  document
-    .getElementById("revealPosition")
-    .textContent =
-      player.position;
+      if (
+        event.key.toLowerCase() === "f"
+      ) {
 
-}
+        fireWeapon();
+
+      }
 
 
-/* =====================================================
-   ENTER CITY
-===================================================== */
+      if (
+        event.key.toLowerCase() === "p"
+      ) {
 
-document
-  .getElementById("enterCity")
-  .addEventListener(
-    "click",
-    enterCity
+        togglePhone();
+
+      }
+
+    }
   );
 
 
-function enterCity() {
+  window.addEventListener(
+    "keyup",
+    event => {
 
-  registration
-    .classList.add("hidden");
+      Game.keys[
+        event.key.toLowerCase()
+      ] = false;
 
-
-  updateUI();
-
-  savePlayer();
-
-  showToast(
-    `Welcome to ${player.surname} territory.`
+    }
   );
 
 }
 
 
 /* =====================================================
-   DEVICE TIME
+   MOBILE CONTROLS
 ===================================================== */
 
-function updateDeviceTime() {
-
-  const now =
-    new Date();
-
-
-  const hours =
-    String(
-      now.getHours()
-    ).padStart(2, "0");
-
-
-  const minutes =
-    String(
-      now.getMinutes()
-    ).padStart(2, "0");
-
-
-  const time =
-    `${hours}:${minutes}`;
-
+function setupMobileControls() {
 
   document
-    .getElementById("deviceTime")
-    .textContent =
-      time;
+    .querySelectorAll(
+      "[data-move]"
+    )
+    .forEach(button => {
+
+      const direction =
+        button.dataset.move;
 
 
-  document
-    .getElementById("phoneTime")
-    .textContent =
-      time;
+      const start =
+        event => {
 
-}
+          event.preventDefault();
 
+          if (
+            direction === "up"
+          ) Game.movement.z = 1;
 
-updateDeviceTime();
+          if (
+            direction === "down"
+          ) Game.movement.z = -1;
 
-setInterval(
-  updateDeviceTime,
-  1000
-);
+          if (
+            direction === "left"
+          ) Game.movement.x = -1;
 
+          if (
+            direction === "right"
+          ) Game.movement.x = 1;
 
-/* =====================================================
-   UI
-===================================================== */
-
-function updateUI() {
-
-  document
-    .getElementById("money")
-    .textContent =
-      Number(player.money)
-        .toLocaleString();
+        };
 
 
-  document
-    .getElementById("dayLabel")
-    .textContent =
-      `DAY ${player.day}`;
+      const stop =
+        event => {
+
+          event.preventDefault();
+
+          if (
+            direction === "up" ||
+            direction === "down"
+          ) {
+
+            Game.movement.z = 0;
+
+          }
+
+          if (
+            direction === "left" ||
+            direction === "right"
+          ) {
+
+            Game.movement.x = 0;
+
+          }
+
+        };
 
 
-  document
-    .getElementById("hungerBar")
-    .style.width =
-      `${Math.max(
-        0,
-        player.hunger
-      )}%`;
+      button.addEventListener(
+        "pointerdown",
+        start
+      );
 
-
-  document
-    .getElementById("energyBar")
-    .style.width =
-      `${Math.max(
-        0,
-        player.energy
-      )}%`;
-
-
-  document
-    .getElementById("hygieneBar")
-    .style.width =
-      `${Math.max(
-        0,
-        player.hygiene
-      )}%`;
-
-
-  document
+      button.addEventList
