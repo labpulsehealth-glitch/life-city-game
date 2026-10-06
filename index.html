@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -10,17 +12,28 @@
     viewport-fit=cover"
   >
 
-  <meta name="theme-color" content="#07090d">
+  <meta
+    name="theme-color"
+    content="#07090d"
+  >
 
   <title>Life City</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
   <!-- Babylon.js 3D ENGINE -->
-  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script
+    src="https://cdn.babylonjs.com/babylon.js">
+  </script>
+
 </head>
 
+
 <body>
+
 
 <!-- =====================================================
      3D GAME
@@ -28,65 +41,134 @@
 
 <main id="game">
 
-  <canvas id="gameCanvas"></canvas>
 
-  <!-- WORLD HUD -->
+  <canvas
+    id="gameCanvas">
+  </canvas>
+
+
+  <!-- =====================================================
+       WORLD HUD
+  ====================================================== -->
 
   <div id="worldHUD">
 
+
     <div class="hud-top">
 
+
       <div class="hud-card location-card">
-        <span class="hud-label">LOCATION</span>
-        <strong id="locationLabel">YOUR STREET</strong>
+
+        <span class="hud-label">
+          LOCATION
+        </span>
+
+        <strong id="locationLabel">
+          YOUR STREET
+        </strong>
+
       </div>
+
 
       <div class="hud-card day-card">
-        <span class="hud-label">DAY</span>
-        <strong id="dayLabel">1</strong>
+
+        <span class="hud-label">
+          DAY
+        </span>
+
+        <strong id="dayLabel">
+          1
+        </strong>
+
       </div>
 
+
       <div class="hud-card money-card">
-        <span class="hud-label">CASH</span>
-        <strong>₦<span id="money">0</span></strong>
+
+        <span class="hud-label">
+          CASH
+        </span>
+
+        <strong>
+          ₦<span id="money">0</span>
+        </strong>
+
       </div>
+
 
     </div>
 
 
-    <!-- NEEDS -->
+    <!-- =====================================================
+         NEEDS
+    ====================================================== -->
 
     <div class="needs-panel">
 
+
       <div class="need-row">
+
         <span>🍔</span>
+
         <div class="need-track">
-          <div id="hungerBar" class="need-fill hunger"></div>
+
+          <div
+            id="hungerBar"
+            class="need-fill hunger">
+          </div>
+
         </div>
+
       </div>
 
+
       <div class="need-row">
+
         <span>⚡</span>
+
         <div class="need-track">
-          <div id="energyBar" class="need-fill energy"></div>
+
+          <div
+            id="energyBar"
+            class="need-fill energy">
+          </div>
+
         </div>
+
       </div>
 
+
       <div class="need-row">
+
         <span>🚿</span>
+
         <div class="need-track">
-          <div id="hygieneBar" class="need-fill hygiene"></div>
+
+          <div
+            id="hygieneBar"
+            class="need-fill hygiene">
+          </div>
+
         </div>
+
       </div>
+
 
     </div>
 
 
-    <!-- WANTED -->
+    <!-- =====================================================
+         WANTED
+    ====================================================== -->
 
-    <div id="wantedPanel" class="wanted-panel hidden">
+    <div
+      id="wantedPanel"
+      class="wanted-panel hidden"
+    >
 
-      <span>WANTED</span>
+      <span>
+        WANTED
+      </span>
 
       <div id="wantedStars">
         ★☆☆☆☆
@@ -94,21 +176,30 @@
 
     </div>
 
+
   </div>
 
 
-  <!-- WORLD MESSAGE -->
+  <!-- =====================================================
+       WORLD MESSAGE
+  ====================================================== -->
 
-  <div id="worldMessage" class="world-message">
+  <div
+    id="worldMessage"
+    class="world-message"
+  >
     Welcome to Life City.
   </div>
 
 
-  <!-- PHONE OPEN -->
+  <!-- =====================================================
+       PHONE OPEN
+  ====================================================== -->
 
   <button
     id="phoneOpen"
     class="floating-phone"
+    type="button"
     aria-label="Open phone"
   >
     📱
@@ -119,39 +210,85 @@
        MOBILE MOVEMENT
   ====================================================== -->
 
-  <div id="mobileControls" class="mobile-controls">
+  <div
+    id="mobileControls"
+    class="mobile-controls"
+  >
+
 
     <div class="movement-pad">
 
-      <button data-move="up">▲</button>
+
+      <button
+        type="button"
+        data-move="up"
+      >
+        ▲
+      </button>
+
 
       <div class="movement-middle">
 
-        <button data-move="left">◀</button>
 
-        <button data-move="down">▼</button>
+        <button
+          type="button"
+          data-move="left"
+        >
+          ◀
+        </button>
 
-        <button data-move="right">▶</button>
+
+        <button
+          type="button"
+          data-move="down"
+        >
+          ▼
+        </button>
+
+
+        <button
+          type="button"
+          data-move="right"
+        >
+          ▶
+        </button>
+
 
       </div>
 
+
     </div>
+
 
     <div class="action-pad">
 
-      <button id="interactButton">
+
+      <button
+        type="button"
+        id="interactButton"
+      >
         E
       </button>
 
-      <button id="runButton">
+
+      <button
+        type="button"
+        id="runButton"
+      >
         RUN
       </button>
 
-      <button id="actionButton">
+
+      <button
+        type="button"
+        id="actionButton"
+      >
         ACTION
       </button>
 
+
     </div>
+
 
   </div>
 
@@ -160,13 +297,21 @@
        PHONE
   ====================================================== -->
 
-  <aside id="phone" class="phone hidden">
+  <aside
+    id="phone"
+    class="phone hidden"
+  >
+
 
     <div class="phone-shell">
 
-      <div class="phone-speaker"></div>
+
+      <div class="phone-speaker">
+      </div>
+
 
       <div class="phone-screen">
+
 
         <div class="phone-status">
 
@@ -181,16 +326,21 @@
         </div>
 
 
-        <!-- PHONE HOME -->
+        <!-- =================================================
+             PHONE HOME
+        ================================================== -->
 
         <section
           id="phoneHome"
           class="phone-page"
         >
 
+
           <div class="phone-header">
 
+
             <div class="mini-profile">
+
 
               <div
                 id="miniAvatar"
@@ -198,6 +348,7 @@
               >
                 ?
               </div>
+
 
               <div>
 
@@ -211,14 +362,20 @@
 
               </div>
 
+
             </div>
+
 
           </div>
 
 
+          <!-- APP GRID -->
+
           <div class="app-grid">
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="profile"
             >
@@ -226,7 +383,9 @@
               <small>Profile</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="bank"
             >
@@ -234,7 +393,9 @@
               <small>Bank</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="house"
             >
@@ -242,7 +403,9 @@
               <small>House</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="market"
             >
@@ -250,7 +413,9 @@
               <small>Market</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="messages"
             >
@@ -258,7 +423,9 @@
               <small>Messages</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="social"
             >
@@ -266,7 +433,9 @@
               <small>Social</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="jobs"
             >
@@ -274,7 +443,9 @@
               <small>Jobs</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon"
               data-app="news"
             >
@@ -282,7 +453,9 @@
               <small>News</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon special-app"
               data-app="dessert"
             >
@@ -290,7 +463,9 @@
               <small>Dessert Dash</small>
             </button>
 
+
             <button
+              type="button"
               class="app-icon combat-app"
               data-app="training"
             >
@@ -298,62 +473,92 @@
               <small>Training</small>
             </button>
 
+
           </div>
+
 
         </section>
 
 
-        <!-- APP PAGE -->
+        <!-- =================================================
+             APP PAGE
+        ================================================== -->
 
         <section
           id="appPage"
           class="phone-page hidden"
         >
 
+
           <div class="app-page-header">
 
+
             <button
+              type="button"
               id="appBack"
               class="back-button"
             >
               ‹
             </button>
 
+
             <h2 id="appTitle">
               App
             </h2>
 
+
           </div>
 
-          <div id="appContent"></div>
+
+          <div id="appContent">
+          </div>
+
 
         </section>
 
 
-        <!-- PHONE NAV -->
+        <!-- =================================================
+             PHONE NAVIGATION
+        ================================================== -->
 
         <nav class="phone-bottom">
 
-          <button id="phoneHomeButton">
+
+          <button
+            type="button"
+            id="phoneHomeButton"
+          >
             <span>⌂</span>
             <small>Home</small>
           </button>
 
-          <button id="phoneAppsButton">
+
+          <button
+            type="button"
+            id="phoneAppsButton"
+          >
             <span>▦</span>
             <small>Apps</small>
           </button>
 
-          <button id="phoneCloseButton">
+
+          <button
+            type="button"
+            id="phoneCloseButton"
+          >
             <span>−</span>
             <small>Hide</small>
           </button>
 
+
         </nav>
+
 
       </div>
 
+
     </div>
+
 
   </aside>
 
@@ -367,27 +572,34 @@
     class="registration-overlay"
   >
 
+
     <div class="registration-card">
+
 
       <div class="registration-brand">
         LIFE CITY
       </div>
 
 
-      <!-- BASIC -->
+      <!-- =================================================
+           BASIC INFORMATION
+      ================================================== -->
 
       <div
         id="basicInformation"
         class="registration-screen"
       >
 
+
         <span class="registration-step">
           LIFE REGISTRATION
         </span>
 
+
         <h1>
           Before the city knows you...
         </h1>
+
 
         <p>
           Tell us a little about yourself.
@@ -399,6 +611,7 @@
         <label for="nicknameInput">
           What should people call you?
         </label>
+
 
         <input
           id="nicknameInput"
@@ -413,6 +626,7 @@
           How old are you?
         </label>
 
+
         <input
           id="ageInput"
           type="number"
@@ -426,9 +640,12 @@
           How should the city know you?
         </label>
 
+
         <div class="gender-options">
 
+
           <label class="gender-card">
+
 
             <input
               type="radio"
@@ -436,16 +653,22 @@
               value="female"
             >
 
-            <span>♀</span>
+
+            <span>
+              ♀
+            </span>
+
 
             <strong>
               Female
             </strong>
 
+
           </label>
 
 
           <label class="gender-card">
+
 
             <input
               type="radio"
@@ -453,16 +676,26 @@
               value="male"
             >
 
-            <span>♂</span>
+
+            <span>
+              ♂
+            </span>
+
 
             <strong>
               Male
             </strong>
 
+
           </label>
+
 
         </div>
 
+
+        <!-- IMPORTANT:
+             This is the button your JS targets.
+        -->
 
         <button
           type="button"
@@ -472,15 +705,19 @@
           CONTINUE
         </button>
 
+
       </div>
 
 
-      <!-- QUESTIONS -->
+      <!-- =================================================
+           QUESTIONS
+      ================================================== -->
 
       <div
         id="questions"
         class="registration-screen hidden"
       >
+
 
         <span
           id="questionNumber"
@@ -488,65 +725,89 @@
         >
         </span>
 
-        <h2 id="questionText"></h2>
 
-        <div id="questionAnswers"></div>
+        <h2 id="questionText">
+        </h2>
+
+
+        <div id="questionAnswers">
+        </div>
+
 
       </div>
 
 
-      <!-- REVEAL -->
+      <!-- =================================================
+           LIFE REVEAL
+      ================================================== -->
 
       <div
         id="lifeReveal"
         class="registration-screen hidden"
       >
 
+
         <div class="reveal-label">
           YOUR LIFE HAS BEEN DECIDED.
         </div>
+
 
         <h2>
           You were born into...
         </h2>
 
+
         <h1 id="revealFamily">
         </h1>
+
 
         <p id="revealDescription">
         </p>
 
-        <div class="reveal-line"></div>
+
+        <div class="reveal-line">
+        </div>
+
 
         <p>
           Your father is...
         </p>
 
+
         <h3 id="revealFather">
         </h3>
+
 
         <p>
           Your position in the family:
         </p>
 
+
         <h3 id="revealPosition">
         </h3>
 
+
         <button
+          type="button"
           id="enterCity"
           class="primary-button"
         >
           ENTER THE CITY
         </button>
 
+
       </div>
 
+
     </div>
+
 
   </section>
 
 
-  <!-- TOAST -->
+  <!-- =====================================================
+       TOAST
+  ====================================================== -->
 
   <div
     id="toast"
@@ -556,12 +817,17 @@
 
 
   <!-- =====================================================
-       SCRIPT
+       GAME SCRIPT
   ====================================================== -->
 
-  <script src="script.js"></script>
+  <script
+    src="script.js"
+  ></script>
+
 
 </main>
 
+
 </body>
-            </html>
+
+  </html>
