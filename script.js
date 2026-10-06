@@ -1,1281 +1,1351 @@
-/* =========================================
+/* =====================================================
    LIFE CITY
-   VERSION 0.1
-========================================= */
+   PHASE 2
+   LIFE REGISTRATION + UNIQUE ORIGIN SYSTEM
+===================================================== */
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
 
-let width;
-let height;
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+  document.getElementById("gameCanvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+let width = 0;
+let height = 0;
+
 
 function resizeCanvas() {
-  width = canvas.width = window.innerWidth;
-  height = canvas.height = window.innerHeight;
+
+  const dpr =
+    Math.min(window.devicePixelRatio || 1, 2);
+
+  width = window.innerWidth;
+  height = window.innerHeight;
+
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
 }
 
+
 resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
 
 
-/* =========================================
-   GAME STATE
-========================================= */
+/* =====================================================
+   DEFAULT PLAYER
+===================================================== */
 
-const defaultState = {
-  name: "Unknown",
-  money: 25000,
+const defaultPlayer = {
+
+  id: null,
+
+  nickname: "",
+
+  age: 19,
+
+  gender: "",
+
+  surname: "",
+
+  family: "",
+
+  familyType: "",
+
+  familyDescription: "",
+
+  position: "",
+
+  father: "",
+
+  mother: "",
+
+  identity: "",
+
+  money: 0,
 
   hunger: 100,
+
   energy: 100,
+
   hygiene: 100,
 
-  hour: 8,
-  minute: 0,
-
   x: 500,
+
   y: 400,
 
-  personality: {
+  day: 1,
+
+  hiddenTraits: {
+
     ambition: 0,
     courage: 0,
     kindness: 0,
     intelligence: 0,
     loyalty: 0,
     risk: 0
-  },
+  }
 
-  origin: "unknown"
 };
 
-let state =
-  JSON.parse(localStorage.getItem("lifeCitySave")) ||
-  structuredClone(defaultState);
+
+/* =====================================================
+   SAVE / LOAD
+===================================================== */
+
+let player =
+  JSON.parse(
+    localStorage.getItem("lifeCityPlayer")
+  ) ||
+  structuredClone(defaultPlayer);
 
 
-/* =========================================
-   SAVE
-========================================= */
+let registeredWorld =
+  JSON.parse(
+    localStorage.getItem("lifeCityPopulation")
+  ) || {};
 
-function saveGame() {
+
+/*
+  IMPORTANT:
+
+  This is the prototype population registry.
+
+  Later, when we add multiplayer,
+  this exact structure will move to
+  the server/database.
+
+  The browser should NEVER be trusted
+  as the final authority for uniqueness.
+*/
+
+
+function savePlayer() {
+
   localStorage.setItem(
-    "lifeCitySave",
-    JSON.stringify(state)
+    "lifeCityPlayer",
+    JSON.stringify(player)
   );
 }
 
 
-/* =========================================
-   CHARACTER QUESTIONS
-========================================= */
+function savePopulation() {
 
-const questions = [
+  localStorage.setItem(
+    "lifeCityPopulation",
+    JSON.stringify(registeredWorld)
+  );
+}
+
+
+/* =====================================================
+   FAMILY DATABASE
+===================================================== */
+
+const families = [
+
   {
-    question:
-      "You find a wallet containing ₦50,000 on your way home. What do you do?",
+    id: "russo",
 
-    answers: [
-      {
-        text: "Try to find the owner.",
-        traits: { kindness: 2, loyalty: 1 }
-      },
-      {
-        text: "Keep it. Nobody saw you.",
-        traits: { risk: 1, ambition: 1 }
-      },
-      {
-        text: "Take the money but throw away the wallet.",
-        traits: { risk: 2 }
-      },
-      {
-        text: "Ask someone you trust what to do.",
-        traits: { loyalty: 1, intelligence: 1 }
-      }
-    ]
+    surname: "Russo",
+
+    name: "THE RUSSO FAMILY",
+
+    type: "Mafia Family",
+
+    description:
+      "A powerful Mafia dynasty known for territory, loyalty and enforcement. Their influence reaches deep into the city's criminal underworld.",
+
+    father:
+      "Don Russo",
+
+    mother:
+      "Elena Russo",
+
+    positions: {
+
+      female: [
+        {
+          key: "eldest-daughter",
+          title: "Eldest Daughter"
+        },
+        {
+          key: "second-daughter",
+          title: "Second Daughter"
+        },
+        {
+          key: "youngest-daughter",
+          title: "Youngest Daughter"
+        }
+      ],
+
+      male: [
+        {
+          key: "eldest-son",
+          title: "Eldest Son"
+        },
+        {
+          key: "second-son",
+          title: "Second Son"
+        },
+        {
+          key: "youngest-son",
+          title: "Youngest Son"
+        }
+      ]
+
+    },
+
+    startingMoney: 75000
   },
 
-  {
-    question:
-      "Someone insults you publicly. How do you react?",
 
-    answers: [
-      {
-        text: "Ignore them and walk away.",
-        traits: { intelligence: 1, patience: 1 }
-      },
-      {
-        text: "Confront them immediately.",
-        traits: { courage: 2, risk: 1 }
-      },
-      {
-        text: "Smile and remember it.",
-        traits: { intelligence: 1, ambition: 1 }
-      },
-      {
-        text: "Ask why they feel that way.",
-        traits: { kindness: 1, intelligence: 1 }
-      }
-    ]
+  {
+    id: "varelli",
+
+    surname: "Varelli",
+
+    name: "THE VARELLI FAMILY",
+
+    type: "Mafia Family",
+
+    description:
+      "An old and influential Mafia dynasty built around information, connections and secrets. Very few things happen in the city without the Varelli family hearing about them.",
+
+    father:
+      "Don Varelli",
+
+    mother:
+      "Lucia Varelli",
+
+    positions: {
+
+      female: [
+        {
+          key: "eldest-daughter",
+          title: "Eldest Daughter"
+        },
+        {
+          key: "second-daughter",
+          title: "Second Daughter"
+        },
+        {
+          key: "youngest-daughter",
+          title: "Youngest Daughter"
+        }
+      ],
+
+      male: [
+        {
+          key: "eldest-son",
+          title: "Eldest Son"
+        },
+        {
+          key: "second-son",
+          title: "Second Son"
+        },
+        {
+          key: "youngest-son",
+          title: "Youngest Son"
+        }
+      ]
+
+    },
+
+    startingMoney: 85000
   },
 
-  {
-    question:
-      "You discover that your closest friend has betrayed you.",
 
-    answers: [
-      {
-        text: "Forgive them.",
-        traits: { kindness: 2 }
-      },
-      {
-        text: "Cut them off completely.",
-        traits: { loyalty: 1, courage: 1 }
-      },
-      {
-        text: "Find out why they did it first.",
-        traits: { intelligence: 2 }
-      },
-      {
-        text: "Plan your revenge.",
-        traits: { ambition: 1, risk: 2 }
-      }
-    ]
+  {
+    id: "moretti",
+
+    surname: "Moretti",
+
+    name: "THE MORETTI FAMILY",
+
+    type: "Mafia Family",
+
+    description:
+      "A wealthy dynasty with legitimate businesses, powerful connections and a hidden criminal network operating behind respectable doors.",
+
+    father:
+      "Don Moretti",
+
+    mother:
+      "Sofia Moretti",
+
+    positions: {
+
+      female: [
+        {
+          key: "eldest-daughter",
+          title: "Eldest Daughter"
+        },
+        {
+          key: "second-daughter",
+          title: "Second Daughter"
+        },
+        {
+          key: "youngest-daughter",
+          title: "Youngest Daughter"
+        }
+      ],
+
+      male: [
+        {
+          key: "eldest-son",
+          title: "Eldest Son"
+        },
+        {
+          key: "second-son",
+          title: "Second Son"
+        },
+        {
+          key: "youngest-son",
+          title: "Youngest Son"
+        }
+      ]
+
+    },
+
+    startingMoney: 100000
   },
 
-  {
-    question:
-      "You are offered a risky opportunity that could make you rich.",
-
-    answers: [
-      {
-        text: "Take the chance.",
-        traits: { risk: 2, ambition: 2 }
-      },
-      {
-        text: "Research everything first.",
-        traits: { intelligence: 2 }
-      },
-      {
-        text: "Ask someone experienced for advice.",
-        traits: { loyalty: 1, intelligence: 1 }
-      },
-      {
-        text: "Stay away from it.",
-        traits: { patience: 1 }
-      }
-    ]
-  },
 
   {
-    question:
-      "Your family is struggling financially. You have a chance to help them, but it could get you into trouble.",
+    id: "bellini",
 
-    answers: [
-      {
-        text: "Do whatever it takes.",
-        traits: { loyalty: 2, courage: 1, risk: 1 }
-      },
-      {
-        text: "Find a legal way to help.",
-        traits: { intelligence: 2, kindness: 1 }
-      },
-      {
-        text: "Refuse to put yourself in danger.",
-        traits: { intelligence: 1 }
-      },
-      {
-        text: "Take the risk, but secretly.",
-        traits: { risk: 2, loyalty: 1 }
-      }
-    ]
+    surname: "Bellini",
+
+    name: "THE BELLINI FAMILY",
+
+    type: "Mafia Family",
+
+    description:
+      "A sophisticated dynasty whose power is built through influence, politics, business and relationships with the city's most important people.",
+
+    father:
+      "Don Bellini",
+
+    mother:
+      "Isabella Bellini",
+
+    positions: {
+
+      female: [
+        {
+          key: "eldest-daughter",
+          title: "Eldest Daughter"
+        },
+        {
+          key: "second-daughter",
+          title: "Second Daughter"
+        },
+        {
+          key: "youngest-daughter",
+          title: "Youngest Daughter"
+        }
+      ],
+
+      male: [
+        {
+          key: "eldest-son",
+          title: "Eldest Son"
+        },
+        {
+          key: "second-son",
+          title: "Second Son"
+        },
+        {
+          key: "youngest-son",
+          title: "Youngest Son"
+        }
+      ]
+
+    },
+
+    startingMoney: 90000
   }
+
 ];
 
-let currentQuestion = 0;
+
+/* =====================================================
+   QUESTIONS
+===================================================== */
+
+const questions = [
+
+  {
+    text:
+      "Someone you love is in trouble. Helping them could put you in trouble too. What do you do?",
+
+    answers: [
+
+      {
+        text:
+          "I help them. I won't leave them alone.",
+
+        traits: {
+          loyalty: 3,
+          courage: 1
+        }
+      },
+
+      {
+        text:
+          "I find a safe way to help.",
+
+        traits: {
+          intelligence: 2,
+          kindness: 1
+        }
+      },
+
+      {
+        text:
+          "I need to know exactly what happened first.",
+
+        traits: {
+          intelligence: 3
+        }
+      },
+
+      {
+        text:
+          "If they are family, I'm taking the risk.",
+
+        traits: {
+          loyalty: 2,
+          risk: 2
+        }
+      }
+
+    ]
+  },
 
 
-/* =========================================
-   INTRO
-========================================= */
+  {
+    text:
+      "You discover that someone has been secretly talking about you.",
 
-function showQuestion() {
+    answers: [
 
-  const question = questions[currentQuestion];
+      {
+        text:
+          "Confront them immediately.",
 
-  document.getElementById("question").textContent =
-    question.question;
+        traits: {
+          courage: 2,
+          risk: 1
+        }
+      },
 
-  const answers =
-    document.getElementById("answers");
+      {
+        text:
+          "Find out exactly what they said first.",
 
-  answers.innerHTML = "";
+        traits: {
+          intelligence: 2
+        }
+      },
 
-  question.answers.forEach(answer => {
+      {
+        text:
+          "Ignore it. I have more important things to worry about.",
 
-    const button = document.createElement("button");
+        traits: {
+          patience: 2
+        }
+      },
 
-    button.className = "answer";
+      {
+        text:
+          "Remember it. I don't forget betrayal.",
 
-    button.textContent = answer.text;
+        traits: {
+          loyalty: 1,
+          ambition: 2
+        }
+      }
 
-    button.onclick = () => chooseAnswer(answer);
-
-    answers.appendChild(button);
-
-  });
-
-  document.getElementById("introProgress").textContent =
-    `Question ${currentQuestion + 1} of ${questions.length}`;
-}
+    ]
+  },
 
 
-function chooseAnswer(answer) {
+  {
+    text:
+      "You suddenly receive an opportunity that could completely change your life.",
 
-  Object.entries(answer.traits).forEach(([trait, value]) => {
+    answers: [
 
-    if (state.personality[trait] !== undefined) {
-      state.personality[trait] += value;
-    }
+      {
+        text:
+          "Take it. Opportunities don't wait.",
 
-  });
+        traits: {
+          ambition: 3,
+          risk: 2
+        }
+      },
 
-  currentQuestion++;
+      {
+        text:
+          "Study it carefully before deciding.",
 
-  if (currentQuestion >= questions.length) {
-    finishCharacterCreation();
-  } else {
-    showQuestion();
+        traits: {
+          intelligence: 3
+        }
+      },
+
+      {
+        text:
+          "Ask someone I trust.",
+
+        traits: {
+          loyalty: 2,
+          intelligence: 1
+        }
+      },
+
+      {
+        text:
+          "I'd rather stay with what I know.",
+
+        traits: {
+          patience: 2
+        }
+      }
+
+    ]
+  },
+
+
+  {
+    text:
+      "Someone weaker than you is being treated unfairly.",
+
+    answers: [
+
+      {
+        text:
+          "Step in immediately.",
+
+        traits: {
+          courage: 2,
+          kindness: 2
+        }
+      },
+
+      {
+        text:
+          "Look for a smarter way to help.",
+
+        traits: {
+          intelligence: 2,
+          kindness: 1
+        }
+      },
+
+      {
+        text:
+          "Stay out of it unless they ask for help.",
+
+        traits: {
+          patience: 1
+        }
+      },
+
+      {
+        text:
+          "It depends on who is causing the problem.",
+
+        traits: {
+          intelligence: 1,
+          risk: 1
+        }
+      }
+
+    ]
+  },
+
+
+  {
+    text:
+      "You could become extremely successful, but your success might create enemies.",
+
+    answers: [
+
+      {
+        text:
+          "I still want the success.",
+
+        traits: {
+          ambition: 3
+        }
+      },
+
+      {
+        text:
+          "I want success, but I need to protect myself.",
+
+        traits: {
+          intelligence: 2,
+          ambition: 1
+        }
+      },
+
+      {
+        text:
+          "I don't want unnecessary enemies.",
+
+        traits: {
+          patience: 2
+        }
+      },
+
+      {
+        text:
+          "Let them come.",
+
+        traits: {
+          courage: 3,
+          risk: 1
+        }
+      }
+
+    ]
   }
-}
+
+];
 
 
-/* =========================================
-   CHARACTER RESULT
-========================================= */
+/* =====================================================
+   REGISTRATION STATE
+===================================================== */
 
-function finishCharacterCreation() {
+let selectedGender = "";
 
-  const traits = state.personality;
-
-  const scores = Object.entries(traits)
-    .sort((a, b) => b[1] - a[1]);
-
-  const strongest = scores[0][0];
-
-  const names = {
-    ambition: "The Ambitious One",
-    courage: "The Fearless One",
-    kindness: "The Heart",
-    intelligence: "The Strategist",
-    loyalty: "The Loyal One",
-    risk: "The Wild Card"
-  };
-
-  state.origin = names[strongest];
-
-  document.querySelector(".intro-card").innerHTML = `
-
-    <span class="eyebrow">YOUR STORY BEGINS</span>
-
-    <h1>${state.origin}</h1>
-
-    <p>
-      You didn't choose this personality.
-      Your decisions created it.
-    </p>
-
-    <div class="app-card">
-      <strong>Your strongest trait</strong>
-      <p>${names[strongest]}</p>
-    </div>
-
-    <button
-      class="app-action"
-      id="startGame"
-    >
-      Enter the City
-    </button>
-
-  `;
-
-  document
-    .getElementById("startGame")
-    .onclick = startGame;
-
-  saveGame();
-}
+let questionIndex = 0;
 
 
-function startGame() {
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-  document
-    .getElementById("introScreen")
-    .classList.add("hidden");
+const registration =
+  document.getElementById("registration");
 
-  showToast(
-    `You are ${state.origin}. Your story begins.`
-  );
+const basicInformation =
+  document.getElementById("basicInformation");
 
-  updateUI();
+const questionsScreen =
+  document.getElementById("questions");
 
-  saveGame();
-}
-
-
-/* =========================================
-   PLAYER
-========================================= */
-
-const player = {
-  width: 30,
-  height: 40,
-  speed: 4
-};
-
-const keys = {};
-
-document.addEventListener("keydown", e => {
-
-  keys[e.key.toLowerCase()] = true;
-
-});
-
-document.addEventListener("keyup", e => {
-
-  keys[e.key.toLowerCase()] = false;
-
-});
+const lifeReveal =
+  document.getElementById("lifeReveal");
 
 
-function movePlayer() {
+/* =====================================================
+   GENDER
+===================================================== */
 
-  let moving = false;
-
-  if (keys["w"] || keys["arrowup"]) {
-    state.y -= player.speed;
-    moving = true;
-  }
-
-  if (keys["s"] || keys["arrowdown"]) {
-    state.y += player.speed;
-    moving = true;
-  }
-
-  if (keys["a"] || keys["arrowleft"]) {
-    state.x -= player.speed;
-    moving = true;
-  }
-
-  if (keys["d"] || keys["arrowright"]) {
-    state.x += player.speed;
-    moving = true;
-  }
-
-  if (moving) {
-
-    state.energy -= 0.006;
-    state.hunger -= 0.002;
-    state.hygiene -= 0.001;
-
-  }
-
-  state.x = Math.max(25, Math.min(state.x, width - 25));
-  state.y = Math.max(80, Math.min(state.y, height - 25));
-
-}
-
-
-/* =========================================
-   MOBILE CONTROLS
-========================================= */
-
-document.querySelectorAll(".controls button")
+document
+  .querySelectorAll(".gender-options button")
   .forEach(button => {
 
-    const key = button.dataset.key;
+    button.addEventListener(
+      "click",
+      () => {
 
-    let actualKey = key;
+        document
+          .querySelectorAll(".gender-options button")
+          .forEach(btn =>
+            btn.classList.remove("selected")
+          );
 
-    if (key === "up") actualKey = "arrowup";
-    if (key === "down") actualKey = "arrowdown";
-    if (key === "left") actualKey = "arrowleft";
-    if (key === "right") actualKey = "arrowright";
+        button.classList.add("selected");
 
-    button.addEventListener("touchstart", e => {
-      e.preventDefault();
-      keys[actualKey] = true;
-    });
+        selectedGender =
+          button.dataset.gender;
 
-    button.addEventListener("touchend", e => {
-      e.preventDefault();
-      keys[actualKey] = false;
-    });
-
-    button.addEventListener("mousedown", () => {
-      keys[actualKey] = true;
-    });
-
-    button.addEventListener("mouseup", () => {
-      keys[actualKey] = false;
-    });
+      }
+    );
 
   });
 
 
-/* =========================================
-   WORLD DRAWING
-========================================= */
+/* =====================================================
+   BASIC REGISTRATION
+===================================================== */
 
-function drawWorld() {
-
-  ctx.clearRect(0, 0, width, height);
-
-  /* GRASS */
-
-  ctx.fillStyle = "#71856b";
-  ctx.fillRect(0, 0, width, height);
-
-
-  /* ROADS */
-
-  ctx.fillStyle = "#4d5050";
-
-  ctx.fillRect(
-    0,
-    height * .55,
-    width,
-    120
-  );
-
-  ctx.fillRect(
-    width * .55,
-    58,
-    120,
-    height
+document
+  .getElementById("basicNext")
+  .addEventListener(
+    "click",
+    startQuestions
   );
 
 
-  /* ROAD LINES */
+function startQuestions() {
 
-  ctx.strokeStyle = "#c5b76c";
-  ctx.lineWidth = 4;
-  ctx.setLineDash([25, 20]);
+  const nickname =
+    document
+      .getElementById("nicknameInput")
+      .value
+      .trim();
 
-  ctx.beginPath();
+  const age =
+    Number(
+      document
+        .getElementById("ageInput")
+        .value
+    );
 
-  ctx.moveTo(0, height * .61);
-  ctx.lineTo(width, height * .61);
 
-  ctx.stroke();
+  if (!nickname) {
 
-  ctx.beginPath();
+    showToast(
+      "Enter the name people will call you."
+    );
 
-  ctx.moveTo(width * .61, 58);
-  ctx.lineTo(width * .61, height);
-
-  ctx.stroke();
-
-  ctx.setLineDash([]);
-
-
-  /* HOUSE */
-
-  drawHouse(
-    110,
-    150,
-    230,
-    150,
-    "YOUR HOME"
-  );
-
-
-  /* SHOP */
-
-  drawBuilding(
-    width - 300,
-    130,
-    190,
-    140,
-    "#8f674f",
-    "MARKET"
-  );
-
-
-  /* CAFE */
-
-  drawBuilding(
-    100,
-    height - 220,
-    180,
-    120,
-    "#7b5367",
-    "CAFÉ"
-  );
-
-
-  /* PARK */
-
-  ctx.fillStyle = "#52705a";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    width - 180,
-    height - 150,
-    75,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-  ctx.fillStyle = "#3e5c46";
-
-  ctx.font = "bold 14px Arial";
-
-  ctx.fillText(
-    "CITY PARK",
-    width - 220,
-    height - 145
-  );
-
-
-  /* NPC */
-
-  drawNPC(
-    width * .45,
-    height * .42
-  );
-
-
-  /* PLAYER */
-
-  drawPlayer(
-    state.x,
-    state.y
-  );
-
-}
-
-
-function drawHouse(x, y, w, h, label) {
-
-  ctx.fillStyle = "#b99b7d";
-
-  ctx.fillRect(x, y, w, h);
-
-  ctx.fillStyle = "#6e4c3d";
-
-  ctx.fillRect(
-    x - 10,
-    y - 45,
-    w + 20,
-    50
-  );
-
-  ctx.fillStyle = "#26343a";
-
-  ctx.fillRect(
-    x + 25,
-    y + 35,
-    45,
-    45
-  );
-
-  ctx.fillRect(
-    x + w - 70,
-    y + 35,
-    45,
-    45
-  );
-
-  ctx.fillStyle = "#4b3025";
-
-  ctx.fillRect(
-    x + w / 2 - 20,
-    y + h - 60,
-    40,
-    60
-  );
-
-  ctx.fillStyle = "white";
-
-  ctx.font = "bold 13px Arial";
-
-  ctx.fillText(
-    label,
-    x + 70,
-    y + h + 22
-  );
-
-}
-
-
-function drawBuilding(x, y, w, h, color, label) {
-
-  ctx.fillStyle = color;
-
-  ctx.fillRect(x, y, w, h);
-
-  ctx.fillStyle = "#d8c38d";
-
-  ctx.fillRect(
-    x + 20,
-    y + 35,
-    40,
-    45
-  );
-
-  ctx.fillRect(
-    x + w - 60,
-    y + 35,
-    40,
-    45
-  );
-
-  ctx.fillStyle = "#352a25";
-
-  ctx.fillRect(
-    x + w / 2 - 25,
-    y + h - 55,
-    50,
-    55
-  );
-
-  ctx.fillStyle = "white";
-
-  ctx.font = "bold 13px Arial";
-
-  ctx.fillText(
-    label,
-    x + 15,
-    y - 10
-  );
-
-}
-
-
-function drawNPC(x, y) {
-
-  /* shadow */
-
-  ctx.fillStyle = "rgba(0,0,0,.2)";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    x,
-    y + 22,
-    18,
-    7,
-    0,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* body */
-
-  ctx.fillStyle = "#3e5974";
-
-  ctx.fillRect(
-    x - 12,
-    y,
-    24,
-    28
-  );
-
-
-  /* head */
-
-  ctx.fillStyle = "#a96f4d";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y - 8,
-    12,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* hair */
-
-  ctx.fillStyle = "#221914";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y - 13,
-    10,
-    Math.PI,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-}
-
-
-function drawPlayer(x, y) {
-
-  /* shadow */
-
-  ctx.fillStyle = "rgba(0,0,0,.25)";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    x,
-    y + 23,
-    18,
-    7,
-    0,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* body */
-
-  ctx.fillStyle = "#242b3a";
-
-  ctx.fillRect(
-    x - 13,
-    y,
-    26,
-    30
-  );
-
-
-  /* head */
-
-  ctx.fillStyle = "#a96f4d";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y - 9,
-    13,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* hair */
-
-  ctx.fillStyle = "#211a18";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y - 14,
-    11,
-    Math.PI,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* eyes */
-
-  ctx.fillStyle = "#111";
-
-  ctx.fillRect(
-    x - 6,
-    y - 9,
-    2,
-    2
-  );
-
-  ctx.fillRect(
-    x + 4,
-    y - 9,
-    2,
-    2
-  );
-
-}
-
-
-/* =========================================
-   GAME CLOCK
-========================================= */
-
-let lastTime = Date.now();
-
-function updateTime() {
-
-  const now = Date.now();
-
-  if (now - lastTime > 5000) {
-
-    state.minute += 10;
-
-    if (state.minute >= 60) {
-      state.minute = 0;
-      state.hour++;
-    }
-
-    if (state.hour >= 24) {
-      state.hour = 0;
-    }
-
-    lastTime = now;
-
-    state.hunger -= .2;
-    state.energy -= .1;
-    state.hygiene -= .1;
-
-    updateUI();
-
-    saveGame();
-
+    return;
   }
 
-}
+
+  if (!age || age < 16 || age > 80) {
+
+    showToast(
+      "Enter an age between 16 and 80."
+    );
+
+    return;
+  }
 
 
-/* =========================================
-   UI
-========================================= */
+  if (!selectedGender) {
 
-function updateUI() {
+    showToast(
+      "Choose how the city knows you."
+    );
 
-  document.getElementById("money").textContent =
-    Math.floor(state.money).toLocaleString();
-
-  document.getElementById("gameTime").textContent =
-    formatTime();
-
-  document.getElementById("phoneTime").textContent =
-    formatTime();
-
-  document.getElementById("playerName").textContent =
-    state.name;
-
-  document.getElementById("playerStatus").textContent =
-    state.origin;
-
-  document.getElementById("hungerBar").style.width =
-    `${Math.max(0, state.hunger)}%`;
-
-  document.getElementById("energyBar").style.width =
-    `${Math.max(0, state.energy)}%`;
-
-  document.getElementById("hygieneBar").style.width =
-    `${Math.max(0, state.hygiene)}%`;
-
-}
+    return;
+  }
 
 
-function formatTime() {
+  player.nickname = nickname;
 
-  return String(state.hour).padStart(2, "0")
-    + ":" +
-    String(state.minute).padStart(2, "0");
+  player.age = age;
 
-}
+  player.gender = selectedGender;
 
-
-/* =========================================
-   PHONE
-========================================= */
-
-const phone = document.getElementById("phone");
-
-document
-  .getElementById("phoneToggle")
-  .onclick = () => {
-
-    phone.classList.remove("hidden");
-
-  };
+  questionIndex = 0;
 
 
-document
-  .getElementById("phoneButton")
-  .onclick = () => {
-
-    phone.classList.toggle("hidden");
-
-  };
-
-
-document
-  .getElementById("homeButton")
-  .onclick = () => {
-
-    document
-      .getElementById("phoneHome")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("appWindow")
-      .classList.add("hidden");
-
-  };
-
-
-document
-  .getElementById("appsButton")
-  .onclick = () => {
-
-    document
-      .getElementById("phoneHome")
-      .classList.remove("hidden");
-
-  };
-
-
-document
-  .getElementById("closeApp")
-  .onclick = () => {
-
-    document
-      .getElementById("appWindow")
-      .classList.add("hidden");
-
-    document
-      .getElementById("phoneHome")
-      .classList.remove("hidden");
-
-  };
-
-
-/* =========================================
-   APPS
-========================================= */
-
-document.querySelectorAll(".app")
-  .forEach(button => {
-
-    button.addEventListener("click", () => {
-
-      openApp(button.dataset.app);
-
-    });
-
-  });
-
-
-function openApp(app) {
-
-  const title =
-    document.getElementById("appTitle");
-
-  const content =
-    document.getElementById("appContent");
-
-  document
-    .getElementById("phoneHome")
+  basicInformation
     .classList.add("hidden");
 
-  document
-    .getElementById("appWindow")
+  questionsScreen
     .classList.remove("hidden");
 
-
-  const apps = {
-
-    profile: {
-      title: "Profile",
-      html: `
-        <div class="app-card">
-          <strong>${state.name}</strong>
-          <p>${state.origin}</p>
-        </div>
-
-        <div class="app-card">
-          <strong>Personality</strong>
-          <p>
-            Ambition: ${state.personality.ambition}<br>
-            Courage: ${state.personality.courage}<br>
-            Intelligence: ${state.personality.intelligence}<br>
-            Loyalty: ${state.personality.loyalty}
-          </p>
-        </div>
-      `
-    },
-
-    bank: {
-      title: "Bank",
-      html: `
-        <div class="app-card">
-          <strong>Available Balance</strong>
-          <p>₦${state.money.toLocaleString()}</p>
-        </div>
-      `
-    },
-
-    house: {
-      title: "House",
-      html: `
-        <div class="app-card">
-          <strong>Your Home</strong>
-          <p>
-            A small starter house.
-            Later you will be able to buy larger
-            properties and completely furnish them.
-          </p>
-
-          <button class="app-action" onclick="enterHouse()">
-            Enter House
-          </button>
-        </div>
-      `
-    },
-
-    market: {
-      title: "Market",
-      html: `
-        <div class="app-card">
-          <strong>Food</strong>
-          <p>Buy food and restore hunger.</p>
-
-          <button
-            class="app-action"
-            onclick="buyFood()"
-          >
-            Buy Meal — ₦1,000
-          </button>
-        </div>
-
-        <div class="app-card">
-          <strong>Soap</strong>
-          <p>Improve your hygiene.</p>
-
-          <button
-            class="app-action"
-            onclick="buySoap()"
-          >
-            Buy Soap — ₦500
-          </button>
-        </div>
-      `
-    },
-
-    messages: {
-      title: "Messages",
-      html: `
-        <div class="app-card">
-          <strong>Unknown Number</strong>
-          <p>
-            "Welcome to the city. We should talk."
-          </p>
-        </div>
-      `
-    },
-
-    social: {
-      title: "Social",
-      html: `
-        <div class="app-card">
-          <strong>People Around You</strong>
-          <p>
-            The city is full of people.
-            Some will become friends.
-            Some will become enemies.
-            Some may completely change your life.
-          </p>
-        </div>
-      `
-    },
-
-    jobs: {
-      title: "Jobs",
-      html: `
-        <div class="app-card">
-          <strong>Part-time Café Worker</strong>
-          <p>Earn ₦5,000.</p>
-
-          <button
-            class="app-action"
-            onclick="workJob()"
-          >
-            Work
-          </button>
-        </div>
-      `
-    },
-
-    news: {
-      title: "City News",
-      html: `
-        <div class="app-card">
-          <strong>City Morning Report</strong>
-          <p>
-            Life in the city continues as normal...
-            for now.
-          </p>
-        </div>
-      `
-    }
-
-  };
-
-
-  const selected = apps[app];
-
-  if (!selected) return;
-
-  title.textContent = selected.title;
-
-  content.innerHTML = selected.html;
-
-}
-
-
-/* =========================================
-   MARKET ACTIONS
-========================================= */
-
-function buyFood() {
-
-  if (state.money < 1000) {
-    showToast("You don't have enough money.");
-    return;
-  }
-
-  state.money -= 1000;
-
-  state.hunger =
-    Math.min(100, state.hunger + 30);
-
-  updateUI();
-
-  saveGame();
-
-  showToast("You bought a meal.");
-
-}
-
-
-function buySoap() {
-
-  if (state.money < 500) {
-    showToast("You don't have enough money.");
-    return;
-  }
-
-  state.money -= 500;
-
-  state.hygiene =
-    Math.min(100, state.hygiene + 25);
-
-  updateUI();
-
-  saveGame();
-
-  showToast("You bought soap.");
-
-}
-
-
-function workJob() {
-
-  state.money += 5000;
-
-  state.energy -= 15;
-  state.hunger -= 8;
-
-  updateUI();
-
-  saveGame();
-
-  showToast("You earned ₦5,000.");
-
-}
-
-
-/* =========================================
-   HOUSE
-========================================= */
-
-function enterHouse() {
-
-  showToast(
-    "House interior coming next..."
-  );
-
-}
-
-
-/* =========================================
-   TOAST
-========================================= */
-
-let toastTimer;
-
-function showToast(message) {
-
-  const toast =
-    document.getElementById("toast");
-
-  toast.textContent = message;
-
-  toast.classList.add("show");
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-
-    toast.classList.remove("show");
-
-  }, 2500);
-
-}
-
-
-/* =========================================
-   GAME LOOP
-========================================= */
-
-function gameLoop() {
-
-  movePlayer();
-
-  drawWorld();
-
-  updateTime();
-
-  requestAnimationFrame(gameLoop);
-
-}
-
-
-/* =========================================
-   START
-========================================= */
-
-updateUI();
-
-if (
-  localStorage.getItem("lifeCitySave")
-) {
-
-  document
-    .getElementById("introScreen")
-    .classList.add("hidden");
-
-} else {
 
   showQuestion();
 
 }
 
-gameLoop();
+
+/* =====================================================
+   QUESTIONS
+===================================================== */
+
+function showQuestion() {
+
+  const question =
+    questions[questionIndex];
+
+
+  document
+    .getElementById("questionNumber")
+    .textContent =
+      `QUESTION ${questionIndex + 1} OF ${questions.length}`;
+
+
+  document
+    .getElementById("questionText")
+    .textContent =
+      question.text;
+
+
+  const answers =
+    document
+      .getElementById("questionAnswers");
+
+
+  answers.innerHTML = "";
+
+
+  question.answers.forEach(
+    answer => {
+
+      const button =
+        document.createElement("button");
+
+      button.className =
+        "question-answer";
+
+      button.textContent =
+        answer.text;
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          applyTraits(
+            answer.traits
+          );
+
+          questionIndex++;
+
+
+          if (
+            questionIndex >=
+            questions.length
+          ) {
+
+            determineLife();
+
+          } else {
+
+            showQuestion();
+
+          }
+
+        }
+      );
+
+
+      answers.appendChild(button);
+
+    }
+  );
+
+}
+
+
+function applyTraits(traits) {
+
+  Object.entries(traits)
+    .forEach(
+      ([trait, value]) => {
+
+        if (
+          player.hiddenTraits[trait] !==
+          undefined
+        ) {
+
+          player.hiddenTraits[trait] +=
+            value;
+
+        }
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   UNIQUE POSITION SYSTEM
+===================================================== */
+
+function getPopulationKey(
+  familyId,
+  positionKey
+) {
+
+  return `${familyId}:${positionKey}`;
+
+}
+
+
+/*
+  This quietly checks which positions
+  already exist in the current world.
+
+  The player NEVER sees this process.
+*/
+
+function positionIsOccupied(
+  familyId,
+  positionKey
+) {
+
+  const key =
+    getPopulationKey(
+      familyId,
+      positionKey
+    );
+
+  return Boolean(
+    registeredWorld[key]
+  );
+
+}
+
+
+/* =====================================================
+   FIND AVAILABLE LIFE
+===================================================== */
+
+function findAvailableLife() {
+
+  const possibleLives = [];
+
+
+  families.forEach(
+    family => {
+
+      const positions =
+        family.positions[player.gender];
+
+
+      positions.forEach(
+        position => {
+
+          if (
+            !positionIsOccupied(
+              family.id,
+              position.key
+            )
+          ) {
+
+            possibleLives.push({
+
+              family,
+
+              position
+
+            });
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  if (!possibleLives.length) {
+
+    /*
+      This is extremely unlikely
+      in this prototype.
+
+      Later the server will have
+      a much larger population system.
+    */
+
+    return null;
+
+  }
+
+
+  /*
+    The player's hidden answers influence
+    which life is more likely, without
+    directly exposing the mechanism.
+  */
+
+  const traits =
+    player.hiddenTraits;
+
+
+  let weights =
+    possibleLives.map(
+      life => {
+
+        let weight = 1;
+
+
+        if (
+          traits.ambition >= 4
+        ) {
+
+          weight +=
+            life.family.startingMoney /
+            50000;
+
+        }
+
+
+        if (
+          traits.risk >= 3
+        ) {
+
+          weight +=
+            life.family.type ===
+            "Mafia Family"
+              ? 2
+              : 0;
+
+        }
+
+
+        if (
+          traits.loyalty >= 4
+        ) {
+
+          weight += 1;
+
+        }
+
+
+        return weight;
+
+      }
+    );
+
+
+  const total =
+    weights.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    );
+
+
+  let random =
+    Math.random() * total;
+
+
+  for (
+    let i = 0;
+    i < possibleLives.length;
+    i++
+  ) {
+
+    random -= weights[i];
+
+    if (random <= 0) {
+
+      return possibleLives[i];
+
+    }
+
+  }
+
+
+  return possibleLives[0];
+
+}
+
+
+/* =====================================================
+   DETERMINE LIFE
+===================================================== */
+
+function determineLife() {
+
+  questionsScreen
+    .classList.add("hidden");
+
+
+  const life =
+    findAvailableLife();
+
+
+  if (!life) {
+
+    showToast(
+      "The city population is full."
+    );
+
+    return;
+
+  }
+
+
+  const family =
+    life.family;
+
+  const position =
+    life.position;
+
+
+  player.surname =
+    family.surname;
+
+  player.family =
+    family.name;
+
+  player.familyType =
+    family.type;
+
+  player.familyDescription =
+    family.description;
+
+  player.position =
+    position.title;
+
+  player.father =
+    family.father;
+
+  player.mother =
+    family.mother;
+
+  player.identity =
+    `${player.nickname} ${player.surname}`;
+
+  player.money =
+    family.startingMoney;
+
+
+  /*
+    Reserve the position.
+
+    In multiplayer this reservation
+    will happen on the server/database.
+  */
+
+  const key =
+    getPopulationKey(
+      family.id,
+      position.key
+    );
+
+
+  registeredWorld[key] = {
+
+    playerId:
+      player.id ||
+      createPlayerId(),
+
+    nickname:
+      player.nickname,
+
+    surname:
+      player.surname,
+
+    gender:
+      player.gender,
+
+    position:
+      player.position
+
+  };
+
+
+  player.id =
+    registeredWorld[key].playerId;
+
+
+  savePopulation();
+
+  savePlayer();
+
+
+  showLifeReveal();
+
+}
+
+
+/* =====================================================
+   PLAYER ID
+===================================================== */
+
+function createPlayerId() {
+
+  return (
+    "player-" +
+    Date.now() +
+    "-" +
+    Math.random()
+      .toString(36)
+      .slice(2, 9)
+  );
+
+}
+
+
+/* =====================================================
+   LIFE REVEAL
+===================================================== */
+
+function showLifeReveal() {
+
+  lifeReveal
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("revealFamily")
+    .textContent =
+      player.family;
+
+
+  document
+    .getElementById("revealDescription")
+    .textContent =
+      player.familyDescription;
+
+
+  document
+    .getElementById("revealFather")
+    .textContent =
+      player.father;
+
+
+  document
+    .getElementById("revealPosition")
+    .textContent =
+      player.position;
+
+}
+
+
+/* =====================================================
+   ENTER CITY
+===================================================== */
+
+document
+  .getElementById("enterCity")
+  .addEventListener(
+    "click",
+    enterCity
+  );
+
+
+function enterCity() {
+
+  registration
+    .classList.add("hidden");
+
+
+  updateUI();
+
+  savePlayer();
+
+  showToast(
+    `Welcome to ${player.surname} territory.`
+  );
+
+}
+
+
+/* =====================================================
+   DEVICE TIME
+===================================================== */
+
+function updateDeviceTime() {
+
+  const now =
+    new Date();
+
+
+  const hours =
+    String(
+      now.getHours()
+    ).padStart(2, "0");
+
+
+  const minutes =
+    String(
+      now.getMinutes()
+    ).padStart(2, "0");
+
+
+  const time =
+    `${hours}:${minutes}`;
+
+
+  document
+    .getElementById("deviceTime")
+    .textContent =
+      time;
+
+
+  document
+    .getElementById("phoneTime")
+    .textContent =
+      time;
+
+}
+
+
+updateDeviceTime();
+
+setInterval(
+  updateDeviceTime,
+  1000
+);
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+function updateUI() {
+
+  document
+    .getElementById("money")
+    .textContent =
+      Number(player.money)
+        .toLocaleString();
+
+
+  document
+    .getElementById("dayLabel")
+    .textContent =
+      `DAY ${player.day}`;
+
+
+  document
+    .getElementById("hungerBar")
+    .style.width =
+      `${Math.max(
+        0,
+        player.hunger
+      )}%`;
+
+
+  document
+    .getElementById("energyBar")
+    .style.width =
+      `${Math.max(
+        0,
+        player.energy
+      )}%`;
+
+
+  document
+    .getElementById("hygieneBar")
+    .style.width =
+      `${Math.max(
+        0,
+        player.hygiene
+      )}%`;
+
+
+  document
