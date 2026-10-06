@@ -2,205 +2,416 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+        maximum-scale=1.0, user-scalable=no">
+
+  <meta name="theme-color" content="#0b0d0f">
+
   <title>Life City</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- GAME -->
+  <!-- =========================
+       GAME
+  ========================== -->
+
   <main id="game">
 
-    <!-- TOP STATUS BAR -->
-    <header class="status-bar">
-      <div>
-        <span class="game-time" id="gameTime">08:00</span>
-        <span class="location" id="locationName">Your Street</span>
-      </div>
+    <!-- ACTUAL DEVICE TIME -->
+    <div class="device-status">
+      <span id="deviceTime">12:00</span>
 
-      <div class="money">
-        ₦<span id="money">25,000</span>
+      <div class="device-icons">
+        <span>▮▮▮</span>
+        <span>WiFi</span>
+        <span>●</span>
       </div>
-    </header>
+    </div>
+
 
     <!-- WORLD -->
-    <section class="world-container">
+    <section class="world">
 
       <canvas id="gameCanvas"></canvas>
 
-      <!-- PLAYER STATUS -->
-      <div class="needs-panel">
+      <!-- SMALL GAME INFORMATION -->
+      <div class="world-info">
+
+        <div>
+          <strong id="dayLabel">DAY 1</strong>
+          <small id="locationLabel">Your Street</small>
+        </div>
+
+        <div class="money-display">
+          ₦<span id="money">0</span>
+        </div>
+
+      </div>
+
+
+      <!-- NEEDS -->
+      <div class="needs">
 
         <div class="need">
           <span>🍔</span>
-          <div class="bar">
-            <div id="hungerBar" class="fill hunger"></div>
+          <div class="need-bar">
+            <div id="hungerBar" class="need-fill hunger"></div>
           </div>
         </div>
 
         <div class="need">
           <span>⚡</span>
-          <div class="bar">
-            <div id="energyBar" class="fill energy"></div>
+          <div class="need-bar">
+            <div id="energyBar" class="need-fill energy"></div>
           </div>
         </div>
 
         <div class="need">
           <span>🚿</span>
-          <div class="bar">
-            <div id="hygieneBar" class="fill hygiene"></div>
+          <div class="need-bar">
+            <div id="hygieneBar" class="need-fill hygiene"></div>
           </div>
         </div>
 
       </div>
 
-      <!-- INTERACTION MESSAGE -->
-      <div id="interactionBox" class="interaction hidden">
-        <strong id="interactionTitle"></strong>
-        <p id="interactionText"></p>
-        <button id="interactionButton">Interact</button>
-      </div>
 
-      <!-- PHONE -->
-      <div id="phone" class="phone">
+      <!-- MOVEMENT CONTROLS -->
+      <div class="movement">
 
-        <div class="phone-header">
-          <span id="phoneTime">08:00</span>
-          <span>● ● ●</span>
+        <button data-direction="up">▲</button>
+
+        <div>
+          <button data-direction="left">◀</button>
+          <button data-direction="down">▼</button>
+          <button data-direction="right">▶</button>
         </div>
 
-        <div id="phoneHome" class="phone-screen">
+      </div>
 
-          <div class="phone-profile">
-            <div class="mini-avatar">🙂</div>
 
-            <div>
-              <strong id="playerName">Unknown</strong>
-              <small id="playerStatus">New in the city</small>
+      <!-- PHONE OPEN BUTTON -->
+      <button id="phoneOpen"
+              class="phone-open">
+        📱
+      </button>
+
+
+      <!-- =========================
+           PHONE
+      ========================== -->
+
+      <aside id="phone" class="phone hidden">
+
+        <div class="phone-notch"></div>
+
+        <div class="phone-status">
+          <span id="phoneTime">12:00</span>
+
+          <div>
+            ▮▮▮ &nbsp; WiFi &nbsp; ●
+          </div>
+        </div>
+
+
+        <!-- PHONE HOME -->
+        <section id="phoneHome" class="phone-page">
+
+          <div class="phone-wallpaper">
+
+            <div class="phone-profile-mini">
+
+              <div id="miniAvatar"
+                   class="mini-avatar">
+                ?
+              </div>
+
+              <div>
+                <strong id="miniName">Unknown</strong>
+                <small id="miniIdentity">
+                  New in the city
+                </small>
+              </div>
+
             </div>
+
+
+            <div class="app-grid">
+
+              <button class="app"
+                      data-app="profile">
+
+                <span>👤</span>
+                <small>Profile</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="bank">
+
+                <span>💳</span>
+                <small>Bank</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="house">
+
+                <span>🏠</span>
+                <small>House</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="market">
+
+                <span>🛍️</span>
+                <small>Market</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="messages">
+
+                <span>💬</span>
+                <small>Messages</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="social">
+
+                <span>👥</span>
+                <small>Social</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="jobs">
+
+                <span>💼</span>
+                <small>Jobs</small>
+
+              </button>
+
+
+              <button class="app"
+                      data-app="news">
+
+                <span>📰</span>
+                <small>News</small>
+
+              </button>
+
+            </div>
+
           </div>
 
-          <div class="phone-app-grid">
+        </section>
 
-            <button class="app" data-app="profile">
-              <span>👤</span>
-              <small>Profile</small>
-            </button>
 
-            <button class="app" data-app="bank">
-              <span>💳</span>
-              <small>Bank</small>
-            </button>
+        <!-- APP PAGE -->
+        <section id="appPage"
+                 class="phone-page app-page hidden">
 
-            <button class="app" data-app="house">
-              <span>🏠</span>
-              <small>House</small>
-            </button>
-
-            <button class="app" data-app="market">
-              <span>🛍️</span>
-              <small>Market</small>
-            </button>
-
-            <button class="app" data-app="messages">
-              <span>💬</span>
-              <small>Messages</small>
-            </button>
-
-            <button class="app" data-app="social">
-              <span>👥</span>
-              <small>Social</small>
-            </button>
-
-            <button class="app" data-app="jobs">
-              <span>💼</span>
-              <small>Jobs</small>
-            </button>
-
-            <button class="app" data-app="news">
-              <span>📰</span>
-              <small>News</small>
-            </button>
-
-          </div>
-
-        </div>
-
-        <!-- APP WINDOW -->
-        <div id="appWindow" class="phone-screen app-window hidden">
-
-          <button id="closeApp" class="back-button">‹</button>
+          <button id="appBack"
+                  class="app-back">
+            ‹
+          </button>
 
           <h2 id="appTitle">App</h2>
 
           <div id="appContent"></div>
 
-        </div>
+        </section>
 
-        <nav class="phone-nav">
-          <button id="homeButton">⌂<small>Home</small></button>
-          <button id="appsButton">▦<small>Apps</small></button>
-          <button id="phoneButton">📱<small>Phone</small></button>
+
+        <!-- PHONE BOTTOM BAR -->
+        <nav class="phone-bottom">
+
+          <button id="phoneHomeButton">
+            ⌂
+            <small>Home</small>
+          </button>
+
+          <button id="phoneAppsButton">
+            ▦
+            <small>Apps</small>
+          </button>
+
+          <button id="phoneCloseButton">
+            −
+            <small>Hide</small>
+          </button>
+
         </nav>
 
-      </div>
-
-      <!-- PHONE TOGGLE -->
-      <button id="phoneToggle" class="phone-toggle">
-        📱
-      </button>
-
-      <!-- CONTROLS -->
-      <div class="controls">
-
-        <button data-key="up">▲</button>
-
-        <div>
-          <button data-key="left">◀</button>
-          <button data-key="down">▼</button>
-          <button data-key="right">▶</button>
-        </div>
-
-      </div>
+      </aside>
 
     </section>
 
   </main>
 
 
-  <!-- CHARACTER CREATION -->
-  <section id="introScreen" class="intro-screen">
+  <!-- =========================
+       LIFE REGISTRATION
+  ========================== -->
 
-    <div class="intro-card">
+  <section id="registration"
+           class="registration">
 
-      <span class="eyebrow">A NEW LIFE BEGINS</span>
+    <div class="registration-card">
 
-      <h1>Welcome to the City.</h1>
+      <div class="registration-step"
+           id="registrationStep">
+        LIFE REGISTRATION
+      </div>
 
-      <p>
-        You don't get to choose exactly who you become.
-        Your choices will shape the person you grow into.
+      <h1 id="registrationTitle">
+        Before the city knows you...
+      </h1>
+
+      <p id="registrationText">
+        Tell us a little about yourself.
+        The rest will be decided by the world you enter.
       </p>
 
-      <div id="questionArea">
 
-        <h2 id="question"></h2>
+      <!-- BASIC INFORMATION -->
 
-        <div id="answers"></div>
+      <div id="basicInformation"
+           class="registration-content">
+
+        <label>
+          What should people call you?
+        </label>
+
+        <input
+          id="nicknameInput"
+          type="text"
+          maxlength="18"
+          placeholder="Your nickname"
+          autocomplete="off"
+        >
+
+
+        <label>
+          How old are you?
+        </label>
+
+        <input
+          id="ageInput"
+          type="number"
+          min="16"
+          max="80"
+          placeholder="Age"
+        >
+
+
+        <label>
+          How should the city know you?
+        </label>
+
+        <div class="gender-options">
+
+          <button data-gender="female">
+            Female
+          </button>
+
+          <button data-gender="male">
+            Male
+          </button>
+
+        </div>
+
+
+        <button id="basicNext"
+                class="primary-button">
+          Continue
+        </button>
 
       </div>
 
-      <div id="introProgress"></div>
+
+      <!-- QUESTIONS -->
+
+      <div id="questions"
+           class="registration-content hidden">
+
+        <div id="questionNumber"
+             class="question-number">
+        </div>
+
+        <h2 id="questionText"></h2>
+
+        <div id="questionAnswers"
+             class="question-answers">
+        </div>
+
+      </div>
+
+
+      <!-- LIFE REVEAL -->
+
+      <div id="lifeReveal"
+           class="registration-content hidden">
+
+        <div class="reveal-label">
+          YOUR LIFE HAS BEEN DECIDED.
+        </div>
+
+        <h2>
+          You were born into...
+        </h2>
+
+        <h1 id="revealFamily"></h1>
+
+        <p id="revealDescription"></p>
+
+        <div class="reveal-divider"></div>
+
+        <p>
+          Your father is...
+        </p>
+
+        <h3 id="revealFather"></h3>
+
+        <p>
+          Your position in the family:
+        </p>
+
+        <h3 id="revealPosition"></h3>
+
+        <button id="enterCity"
+                class="primary-button">
+          Enter the City
+        </button>
+
+      </div>
 
     </div>
 
   </section>
 
 
-  <div id="toast" class="toast"></div>
+  <!-- TOAST -->
+
+  <div id="toast"
+       class="toast">
+  </div>
+
 
   <script src="script.js"></script>
 
 </body>
-</html>
+        </html>
