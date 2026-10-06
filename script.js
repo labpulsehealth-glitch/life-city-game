@@ -761,7 +761,99 @@ function startQuestions() {
   showQuestion();
 
 }
+const continueBtn = document.getElementById("continueBtn");
 
+if (continueBtn) {
+  continueBtn.addEventListener("click", () => {
+    const nickname = document.getElementById("nickname")?.value.trim();
+    const age = document.getElementById("age")?.value;
+    const gender = document.querySelector(
+      'input[name="gender"]:checked'
+    )?.value;
+
+    if (!nickname) {
+      showToast("Please enter your nickname.");
+      return;
+    }
+
+    if (!age || Number(age) < 13) {
+      showToast("Please enter a valid age.");
+      return;
+    }
+
+    if (!gender) {
+      showToast("Please select your gender.");
+      return;
+    }
+
+    // Collect the hidden-trait answers
+    const answers = {};
+
+    document.querySelectorAll(
+      '#registration input[type="radio"]:checked'
+    ).forEach(input => {
+      if (input.name !== "gender") {
+        answers[input.name] = input.value;
+      }
+    });
+
+    // Save registration information
+    player.nickname = nickname;
+    player.age = Number(age);
+    player.gender = gender;
+
+    // Apply hidden personality influences
+    applyTraits(answers);
+
+    // Generate the player's life silently
+    const life = findAvailableLife(gender);
+
+    if (!life) {
+      showToast("Unable to generate a life right now.");
+      return;
+    }
+
+    player.family = life.family;
+    player.position = life.position;
+    player.father = life.father;
+    player.mother = life.mother;
+    player.money = life.money;
+    player.surname = life.family;
+
+    player.id =
+      "P" +
+      Date.now().toString(36) +
+      Math.random().toString(36).substring(2, 7);
+
+    registeredWorld.push({
+      id: player.id,
+      family: player.family,
+      position: player.position,
+      gender: player.gender
+    });
+
+    localStorage.setItem(
+      "lifeCityPopulation",
+      JSON.stringify(registeredWorld)
+    );
+
+    localStorage.setItem(
+      "lifeCityPlayer",
+      JSON.stringify(player)
+    );
+
+    // Close registration
+    const registration = document.getElementById("registration");
+
+    if (registration) {
+      registration.classList.remove("show");
+      registration.style.display = "none";
+    }
+
+    // Show the dramatic life reveal
+    showLifeReveal(life);
+  });
+}
 
 /* =====================================================
    QUESTIONS
