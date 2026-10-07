@@ -1517,7 +1517,7 @@ async function initializeEngine() {
   createScene();
 
 // TEMPORARILY DISABLED
-// await loadPlayerCharacter();
+await loadPlayerCharacter();
 // await loadPlayerAnimations();
 
 
@@ -1685,7 +1685,7 @@ function createScene() {
   createCityBlocks(scene);
 
 
-  createPlayer(scene);
+  createPlayerPlaceholder(scene);
 
 
   createNPCs(scene);
