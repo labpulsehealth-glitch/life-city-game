@@ -1485,6 +1485,8 @@ function initializeEngine() {
 
   Game.scene =
     createScene();
+   await loadPlayerCharacter();
+await loadPlayerAnimations();
 
 
   Game.engine.runRenderLoop(
