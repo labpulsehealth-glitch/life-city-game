@@ -16,6 +16,8 @@ const Game = {
 
   playerMesh: null,
   playerParts: {},
+     playerAnimations: {},
+  currentAnimation: null,
 
   npcs: [],
   enemies: [],
@@ -58,7 +60,54 @@ const Game = {
 
   worldDay: 1
 };
+/* =====================================================
+   PLAYER CHARACTER
+===================================================== */
 
+async function loadPlayerCharacter() {
+  if (!Game.scene) return;
+
+  // Remove old character if one exists
+  if (Game.playerMesh) {
+    Game.playerMesh.dispose();
+    Game.playerMesh = null;
+  }
+
+  try {
+    const result = await BABYLON.SceneLoader.ImportMeshAsync(
+      "",
+      "./assets/characters/",
+      "idle.glb",
+      Game.scene
+    );
+
+    const character = result.meshes[0];
+
+    character.name = "LifeCityPlayer";
+    character.position = new BABYLON.Vector3(0, 0, 0);
+    character.scaling = new BABYLON.Vector3(1, 1, 1);
+
+    Game.playerMesh = character;
+
+    // Store the skeleton
+    if (result.skeletons.length > 0) {
+      Game.playerMesh.skeleton = result.skeletons[0];
+    }
+
+    // Load idle animation
+    if (result.animationGroups.length > 0) {
+      Game.playerAnimations.idle = result.animationGroups[0];
+      Game.currentAnimation = Game.playerAnimations.idle;
+
+      Game.currentAnimation.start(true);
+    }
+
+    console.log("Life City character loaded:", character.name);
+
+  } catch (error) {
+    console.error("Character failed to load:", error);
+  }
+}
 
 /* =====================================================
    DEFAULT PLAYER
