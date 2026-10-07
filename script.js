@@ -66,49 +66,79 @@ const Game = {
 
 async function loadPlayerCharacter() {
    async function loadPlayerAnimations() {
+
   try {
-    const walking = await BABYLON.SceneLoader.ImportMeshAsync(
-      "",
-      "./assets/characters/",
-      "walking.glb",
-      Game.scene
-    );
 
-    const running = await BABYLON.SceneLoader.ImportMeshAsync(
-      "",
-      "./assets/characters/",
-      "running.glb",
-      Game.scene
-    );
+    const walking =
+      await BABYLON.SceneLoader.ImportMeshAsync(
+        "",
+        "./assets/characters/",
+        "walking.glb",
+        Game.scene
+      );
 
-    if (walking.animationGroups.length > 0) {
-      Game.playerAnimations.walk = walking.animationGroups[0];
-      walking.animationGroups[0].stop();
+    const running =
+      await BABYLON.SceneLoader.ImportMeshAsync(
+        "",
+        "./assets/characters/",
+        "running.glb",
+        Game.scene
+      );
+
+
+    if (
+      walking.animationGroups &&
+      walking.animationGroups.length > 0
+    ) {
+
+      Game.playerAnimations.walk =
+        walking.animationGroups[0];
+
+      Game.playerAnimations.walk.stop();
+
     }
 
-    if (running.animationGroups.length > 0) {
-      Game.playerAnimations.run = running.animationGroups[0];
-      running.animationGroups[0].stop();
+
+    if (
+      running.animationGroups &&
+      running.animationGroups.length > 0
+    ) {
+
+      Game.playerAnimations.run =
+        running.animationGroups[0];
+
+      Game.playerAnimations.run.stop();
+
     }
 
-    // We only need the animation data from these files.
-    walking.meshes.forEach(mesh => {
-      if (mesh !== walking.meshes[0]) {
-        mesh.dispose();
-      }
-    });
 
-    running.meshes.forEach(mesh => {
-      if (mesh !== running.meshes[0]) {
-        mesh.dispose();
-      }
-    });
+    /*
+      Remove the imported animation models.
+      We only want their animation data.
+    */
 
-    console.log("Player animations loaded.");
+    walking.meshes.forEach(
+      mesh => mesh.dispose()
+    );
+
+    running.meshes.forEach(
+      mesh => mesh.dispose()
+    );
+
+
+    console.log(
+      "Player animations loaded."
+    );
 
   } catch (error) {
-    console.error("Animation loading failed:", error);
+
+    console.error(
+      "Animation loading failed:",
+      error
+    );
+
   }
+
    }
    function playPlayerAnimation(name) {
   const animation = Game.playerAnimations[name];
@@ -1443,7 +1473,7 @@ function enterTheCity() {
    BABYLON INITIALIZATION
 ===================================================== */
 
-function initializeEngine() {
+async function initializeEngine() {
 
   if (!canvas) {
 
