@@ -1517,9 +1517,8 @@ async function initializeEngine() {
   createScene();
 
 // TEMPORARILY DISABLED
-await loadPlayerCharacter();
+// await loadPlayerCharacter();
 // await loadPlayerAnimations();
-
 
   Game.engine.runRenderLoop(
     () => {
@@ -1685,7 +1684,7 @@ function createScene() {
   createCityBlocks(scene);
 
 
-  createPlayerPlaceholder(scene);
+  createPlayer(scene);
 
 
   createNPCs(scene);
