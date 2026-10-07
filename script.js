@@ -1580,6 +1580,9 @@ function createScene() {
   const scene =
     new BABYLON.Scene(Game.engine);
 
+  // Make the scene available immediately
+  Game.scene = scene;
+
 
   scene.clearColor =
     new BABYLON.Color4(
