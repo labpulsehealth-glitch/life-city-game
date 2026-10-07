@@ -65,6 +65,63 @@ const Game = {
 ===================================================== */
 
 async function loadPlayerCharacter() {
+   async function loadPlayerAnimations() {
+  try {
+    const walking = await BABYLON.SceneLoader.ImportMeshAsync(
+      "",
+      "./assets/characters/",
+      "walking.glb",
+      Game.scene
+    );
+
+    const running = await BABYLON.SceneLoader.ImportMeshAsync(
+      "",
+      "./assets/characters/",
+      "running.glb",
+      Game.scene
+    );
+
+    if (walking.animationGroups.length > 0) {
+      Game.playerAnimations.walk = walking.animationGroups[0];
+      walking.animationGroups[0].stop();
+    }
+
+    if (running.animationGroups.length > 0) {
+      Game.playerAnimations.run = running.animationGroups[0];
+      running.animationGroups[0].stop();
+    }
+
+    // We only need the animation data from these files.
+    walking.meshes.forEach(mesh => {
+      if (mesh !== walking.meshes[0]) {
+        mesh.dispose();
+      }
+    });
+
+    running.meshes.forEach(mesh => {
+      if (mesh !== running.meshes[0]) {
+        mesh.dispose();
+      }
+    });
+
+    console.log("Player animations loaded.");
+
+  } catch (error) {
+    console.error("Animation loading failed:", error);
+  }
+   }
+   function playPlayerAnimation(name) {
+  const animation = Game.playerAnimations[name];
+
+  if (!animation || Game.currentAnimation === animation) return;
+
+  if (Game.currentAnimation) {
+    Game.currentAnimation.stop();
+  }
+
+  Game.currentAnimation = animation;
+  animation.start(true);
+   }
   if (!Game.scene) return;
 
   // Remove old character if one exists
