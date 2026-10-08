@@ -1517,7 +1517,7 @@ async function initializeEngine() {
   createScene();
 
 // TEMPORARILY DISABLED
-// await loadPlayerCharacter();
+await loadPlayerCharacter();
 // await loadPlayerAnimations();
 
   Game.engine.runRenderLoop(
