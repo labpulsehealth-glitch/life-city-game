@@ -175,6 +175,9 @@ async function loadPlayerCharacter() {
     character.scaling = new BABYLON.Vector3(1, 1, 1);
 
     Game.playerMesh = character;
+     if (Game.camera) {
+  Game.camera.lockedTarget = Game.playerMesh;
+     }
 
     // Store the skeleton
     if (result.skeletons.length > 0) {
